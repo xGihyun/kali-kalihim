@@ -1,0 +1,22 @@
+POST https://httpbin.org/post HTTP/1.1
+content-type: application/json
+accept: application/json
+
+{
+  "uuid": "{{$uuid}}",
+  "timestamp": "{{$timestamp}}",
+  "date": "{{$date}}",
+  "randomInt": "{{$randomInt}}",
+}
+
+###
+
+POST https://httpbin.org/post HTTP/1.1
+content-type: application/json
+accept: application/json
+
+{
+  "randomInt": "{{$randomInt}}",
+}
+
+###

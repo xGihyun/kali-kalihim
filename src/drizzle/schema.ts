@@ -15,7 +15,7 @@ import {
  * Enums
  */
 
-export const roleEnum = pgEnum("role", ["student", "admin"]);
+export const roleEnum = pgEnum("role", ["player", "admin"]);
 export const sexEnum = pgEnum("sex", ["male", "female"]);
 export const arnisTechniqueTypeEnum = pgEnum("arnis_technique_type", [
 	"skill",
@@ -43,6 +43,7 @@ export const arnisCardBattleStatusEnum = pgEnum("arnis_card_battle_status", [
 	"missed",
 	"blocked",
 ]);
+export const rubricStatusEnum = pgEnum("rubric_status", ["inactive", "active"]);
 
 /*
  * Tables
@@ -55,7 +56,7 @@ export const UsersTable = pgTable("users", {
 	updated_at: timestamp("updated_at").notNull().defaultNow(),
 	email: text("email").notNull().unique(),
 	password: text("password").notNull(),
-	role: roleEnum("role").notNull().default("student"),
+	role: roleEnum("role").notNull().default("player"),
 });
 
 export const UserDetailsTable = pgTable("user_details", {
@@ -75,6 +76,8 @@ export const UserDetailsTable = pgTable("user_details", {
 		.unique(),
 });
 
+// Player only
+
 export const SectionsTable = pgTable("sections", {
 	section_id: uuid("section_id").primaryKey().defaultRandom(),
 
@@ -90,12 +93,12 @@ export const ArnisSeasonsTable = pgTable("arnis_seasons", {
 	end: date("end").notNull(),
 });
 
-export const StudentSeasonDetailsTable = pgTable("student_season_details", {
-	student_season_detail_id: uuid("student_season_detail_id")
+export const PlayerSeasonDetailsTable = pgTable("player_season_details", {
+	player_season_detail_id: uuid("player_season_detail_id")
 		.primaryKey()
 		.defaultRandom(),
 
-	total_score: smallint("total_score").notNull().default(0),
+	rating: smallint("rating").notNull().default(0),
 
 	user_id: uuid("user_id")
 		.references(() => UsersTable.user_id)
@@ -118,8 +121,8 @@ export const PowerCardsTable = pgTable("power_cards", {
 	image_url: text("image_url"),
 });
 
-export const StudentPowerCardsTable = pgTable("student_power_cards", {
-	student_power_card_id: uuid("student_power_card_id")
+export const PlayerPowerCardsTable = pgTable("player_power_cards", {
+	player_power_card_id: uuid("player_power_card_id")
 		.primaryKey()
 		.defaultRandom(),
 
@@ -133,7 +136,6 @@ export const StudentPowerCardsTable = pgTable("student_power_cards", {
 		.notNull(),
 });
 
-
 // Matches
 
 export const MatchesTable = pgTable("matches", {
@@ -144,7 +146,22 @@ export const MatchesTable = pgTable("matches", {
 		fields: "hour",
 	}).notNull(),
 	status: matchStatusEnum("status").notNull().default("pending"),
-	comment: text("comment"),
+});
+
+export const MatchCommentsTable = pgTable("match_comments", {
+	match_comment_id: uuid("match_comment_id").primaryKey().defaultRandom(),
+
+	created_at: timestamp("created_at").notNull().defaultNow(),
+	updated_at: timestamp("updated_at").notNull().defaultNow(),
+	content: text("content"),
+
+	// The admin who commented
+	user_id: uuid("user_id")
+		.references(() => UsersTable.user_id)
+		.notNull(),
+	match_id: uuid("match_id")
+		.references(() => MatchesTable.match_id)
+		.notNull(),
 });
 
 export const ArnisTechniquesTable = pgTable("arnis_techniques", {
@@ -170,10 +187,18 @@ export const MatchArnisTechniquesTable = pgTable("match_arnis_techniques", {
 
 export const RubricsTable = pgTable("rubrics", {
 	rubric_id: smallserial("rubric_id").primaryKey(),
+
+	name: text("name").notNull(),
+	description: text("description"),
+	max_score: smallint("max_score").notNull(),
+
+	// `active` - The rubric will be used in scoring
+	// `inactive` - The rubric will NOT be used in scoring
+	status: rubricStatusEnum("status").notNull().default("active"),
 });
 
-export const StudentMatchesTable = pgTable("student_matches", {
-	student_match_id: uuid("student_match_id").primaryKey().defaultRandom(),
+export const PlayerMatchesTable = pgTable("player_matches", {
+	player_match_id: uuid("player_match_id").primaryKey().defaultRandom(),
 
 	match_id: uuid("match_id")
 		.references(() => MatchesTable.match_id)
@@ -183,15 +208,15 @@ export const StudentMatchesTable = pgTable("student_matches", {
 		.notNull(),
 });
 
-export const StudentMatchScoresTable = pgTable("student_match_scores", {
-	student_match_score_id: uuid("student_match_score_id")
+export const PlayerMatchScoresTable = pgTable("player_match_scores", {
+	player_match_score_id: uuid("player_match_score_id")
 		.primaryKey()
 		.defaultRandom(),
 
 	score: smallint("score").notNull(),
 
-	student_match_id: uuid("student_match_id")
-		.references(() => StudentMatchesTable.student_match_id)
+	player_match_id: uuid("player_match_id")
+		.references(() => PlayerMatchesTable.player_match_id)
 		.notNull(),
 	rubric_id: smallserial("rubric_id")
 		.references(() => RubricsTable.rubric_id)
@@ -231,7 +256,9 @@ export const ArnisCardEffectsTable = pgTable("arnis_card_effects", {
 });
 
 export const ArnisCardBattleTable = pgTable("arnis_card_battles", {
-	arnis_card_battle_id: uuid("arnis_card_battle_id").primaryKey().defaultRandom(),
+	arnis_card_battle_id: uuid("arnis_card_battle_id")
+		.primaryKey()
+		.defaultRandom(),
 
 	status: arnisCardBattleStatusEnum("status"),
 	damage: decimal("damage", { scale: 5, precision: 2 }),
@@ -244,5 +271,25 @@ export const ArnisCardBattleTable = pgTable("arnis_card_battles", {
 		.notNull(),
 	match_id: uuid("match_id")
 		.references(() => MatchesTable.match_id)
+		.notNull(),
+});
+
+// Badges
+
+export const BadgesTable = pgTable("badges", {
+	badge_id: smallserial("badge_id").primaryKey(),
+
+	name: text("name").notNull(),
+	description: text("description").notNull(),
+});
+
+export const PlayerBadgesTable = pgTable("player_badges", {
+	player_badge_id: uuid("player_badge_id").primaryKey().defaultRandom(),
+
+	user_id: uuid("user_id")
+		.references(() => UsersTable.user_id)
+		.notNull(),
+	badge_id: uuid("badge_id")
+		.references(() => BadgesTable.badge_id)
 		.notNull(),
 });
