@@ -25,9 +25,16 @@ export default defineConfig({
   output: "hybrid",
   vite: {
     plugins: [
+      Icons({ compiler: "jsx", jsx: "react" }),
       Icons({
         compiler: "astro",
       }),
     ],
+    resolve: {
+      alias: [
+        { find: "icons:react", replacement: "~icons" },
+        { find: "icons:astro", replacement: "~icons" },
+      ],
+    },
   },
 });
