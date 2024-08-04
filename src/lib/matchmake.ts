@@ -52,7 +52,7 @@ export function matchmake(
     console.log("Matching unmatched:", unmatchedPlayer);
 
     const filteredBucket = bucket.filter(
-      (player) => player.user_id !== unmatchedPlayer?.user_id,
+      (player) => player.userId !== unmatchedPlayer?.userId,
     );
     const match = [unmatchedPlayer, filteredBucket.pop()!];
 

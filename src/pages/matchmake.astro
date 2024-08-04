@@ -1,0 +1,23 @@
+---
+import Layout from "@/components/layouts/layout.astro";
+import MatchmakeForm from "@/components/user/admin/matchmake";
+import { db } from "@/drizzle/db";
+import {
+  ArnisSeasonsTable,
+  ArnisTechniquesTable,
+  SectionsTable,
+} from "@/drizzle/schema";
+
+const arnisTechniques = await db.select().from(ArnisTechniquesTable);
+const sections = await db.select().from(SectionsTable);
+const arnisSeasons = await db.select().from(ArnisSeasonsTable);
+---
+
+<Layout title="Matchmake">
+  <MatchmakeForm
+    arnis_techniques={arnisTechniques}
+    sections={sections}
+    arnis_seasons={arnisSeasons}
+    client:load
+  />
+</Layout>

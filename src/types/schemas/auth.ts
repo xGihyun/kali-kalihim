@@ -1,29 +1,29 @@
 import { z } from "astro/zod";
 
 const FullNameSchema = z.object({
-  first_name: z.string(),
-  middle_name: z.string().optional(),
-  last_name: z.string(),
+  firstName: z.string(),
+  middleName: z.string().optional(),
+  lastName: z.string(),
 });
 
 export const RegisterSchema = z
   .object({
     email: z.string().email(),
     password: z.string().min(7),
-    confirm_password: z.string().min(7),
+    confirmPassword: z.string().min(7),
 
     sex: z.enum(["male", "female"]),
-    birth_date: z.coerce.date(),
+    birthDate: z.coerce.date(),
   })
   .merge(FullNameSchema)
-  .refine(({ password, confirm_password }) => password === confirm_password, {
+  .refine(({ password, confirmPassword }) => password === confirmPassword, {
     message: "Passwords don't match.",
-    path: ["confirm_password"],
+    path: ["confirmPassword"],
   });
 
 export const PlayerSeasonSchema = z.object({
-  section_id: z.string(),
-  user_id: z.string()
+  sectionId: z.string(),
+  userId: z.string(),
 });
 
 export const LoginSchema = z.object({
@@ -31,4 +31,5 @@ export const LoginSchema = z.object({
   password: z.string().min(7),
 });
 
-export type Register = z.infer<typeof RegisterSchema>
+export type RegisterInput = z.infer<typeof RegisterSchema>;
+export type PlayerSeasonInput = z.infer<typeof PlayerSeasonSchema>;

@@ -1,8 +1,14 @@
 ---
 import Layout from "@/components/layouts/layout.astro";
 import RegisterForm from "@/components/user/register";
+import NewSeasonForm from "@/components/user/new-season";
+import { db } from "@/drizzle/db";
+import { SectionsTable } from "@/drizzle/schema";
+
+const sections = await db.select().from(SectionsTable)
 ---
 
 <Layout title="Register">
   <RegisterForm client:load />
+  <NewSeasonForm sections={sections} client:load />
 </Layout>

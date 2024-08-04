@@ -1,4 +1,4 @@
-import { RegisterSchema, type Register } from "@/types/schemas/auth";
+import { RegisterSchema, type RegisterInput } from "@/types/schemas/auth";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -31,19 +31,19 @@ import { Calendar } from "@/components/ui/calendar";
 import { IconCalendar } from "@/assets/icons";
 
 export default function Register(): JSX.Element {
-  const form = useForm<Register>({
+  const form = useForm<RegisterInput>({
     resolver: zodResolver(RegisterSchema),
     defaultValues: {
-      middle_name: "",
-      first_name: "",
-      last_name: "",
+      middleName: "",
+      firstName: "",
+      lastName: "",
       email: "",
       password: "",
-      confirm_password: "",
+      confirmPassword: "",
     },
   });
 
-  async function onSubmit(values: Register) {
+  async function onSubmit(values: RegisterInput) {
     const toastId = toast.loading("Submitting...");
     console.log("Values:", values);
 
@@ -94,7 +94,7 @@ export default function Register(): JSX.Element {
 
         <FormField
           control={form.control}
-          name="confirm_password"
+          name="confirmPassword"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Confirm Password</FormLabel>
@@ -108,7 +108,7 @@ export default function Register(): JSX.Element {
 
         <FormField
           control={form.control}
-          name="first_name"
+          name="firstName"
           render={({ field }) => (
             <FormItem>
               <FormLabel>First Name</FormLabel>
@@ -122,7 +122,7 @@ export default function Register(): JSX.Element {
 
         <FormField
           control={form.control}
-          name="middle_name"
+          name="middleName"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Middle Name</FormLabel>
@@ -136,7 +136,7 @@ export default function Register(): JSX.Element {
 
         <FormField
           control={form.control}
-          name="last_name"
+          name="lastName"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Last Name</FormLabel>
@@ -172,7 +172,7 @@ export default function Register(): JSX.Element {
 
         <FormField
           control={form.control}
-          name="birth_date"
+          name="birthDate"
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>Date of birth</FormLabel>
