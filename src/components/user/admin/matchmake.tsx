@@ -26,9 +26,9 @@ import type {
 import type { SectionOutput } from "@/types/schemas/player";
 
 type Props = {
-  arnis_techniques: Omit<ArnisTechniqueOutput, "video_url">[];
+  arnisTechniques: Omit<ArnisTechniqueOutput, "video_url">[];
   sections: SectionOutput[];
-  arnis_seasons: ArnisSeasonOutput[];
+  arnisSeasons: ArnisSeasonOutput[];
 };
 
 export default function Matchmake(props: Props): JSX.Element {
@@ -104,7 +104,7 @@ export default function Matchmake(props: Props): JSX.Element {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {props.arnis_seasons.map((season) => (
+                  {props.arnisSeasons.map((season) => (
                     <SelectItem
                       value={season.arnisSeasonId.toString()}
                       key={season.arnisSeasonId}
@@ -135,7 +135,7 @@ export default function Matchmake(props: Props): JSX.Element {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {props.arnis_techniques.map((technique) => (
+                  {props.arnisTechniques.map((technique) => (
                     <SelectItem
                       value={technique.arnisTechniqueId.toString()}
                       key={technique.arnisTechniqueId}

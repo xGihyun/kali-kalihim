@@ -2,7 +2,7 @@ import { z } from "astro/zod";
 
 const FullNameSchema = z.object({
   firstName: z.string(),
-  middleName: z.string().optional(),
+  middleName: z.string().nullable(),
   lastName: z.string(),
 });
 
@@ -33,3 +33,4 @@ export const LoginSchema = z.object({
 
 export type RegisterInput = z.infer<typeof RegisterSchema>;
 export type PlayerSeasonInput = z.infer<typeof PlayerSeasonSchema>;
+export type FullNameInput = z.infer<typeof FullNameSchema>

@@ -42,7 +42,7 @@ export default function NewSeason({ sections }: Props): JSX.Element {
 		const toastId = toast.loading("Submitting...");
 		console.log("Values:", values);
 
-		const { error } = await actions.player_season_register.safe(values);
+		const { error } = await actions.playerSeasonRegister.safe(values);
 
 		if (error) {
 			console.error("ERROR:", error);

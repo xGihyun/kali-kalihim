@@ -1,0 +1,50 @@
+---
+export const prerender = false;
+
+import MatchResultForm from "@/components/user/admin/match-result";
+import Layout from "@/components/layouts/layout.astro";
+import {
+  MatchPlayersTable,
+  PlayerSeasonDetailsTable,
+  RubricsTable,
+  UserDetailsTable,
+  UsersTable,
+} from "@/drizzle/schema";
+import { db } from "@/drizzle/db";
+import { and, eq } from "drizzle-orm";
+import type { MatchPlayer } from "@/types/schemas/match";
+
+const { match_id } = Astro.params;
+
+if (!match_id) {
+  return Astro.redirect("/history");
+}
+
+const players: MatchPlayer[] = await db
+  .select({
+    firstName: UserDetailsTable.firstName,
+    middleName: UserDetailsTable.middleName,
+    lastName: UserDetailsTable.lastName,
+    matchPlayerId: MatchPlayersTable.matchPlayerId,
+    userId: UsersTable.userId,
+  })
+  .from(MatchPlayersTable)
+  .innerJoin(UsersTable, eq(MatchPlayersTable.userId, UsersTable.userId))
+  .innerJoin(UserDetailsTable, eq(UsersTable.userId, UserDetailsTable.userId))
+  .where(eq(MatchPlayersTable.matchId, match_id));
+
+const rubrics = await db
+  .select()
+  .from(RubricsTable)
+  .where(eq(RubricsTable.status, "active"));
+---
+
+<Layout title="Match">
+  <MatchResultForm
+    arnisSeasonId={2}
+    players={players}
+    rubrics={rubrics}
+    matchId={match_id}
+    client:load
+  />
+</Layout>

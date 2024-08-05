@@ -15,9 +15,9 @@ const arnisSeasons = await db.select().from(ArnisSeasonsTable);
 
 <Layout title="Matchmake">
   <MatchmakeForm
-    arnis_techniques={arnisTechniques}
+    arnisTechniques={arnisTechniques}
     sections={sections}
-    arnis_seasons={arnisSeasons}
+    arnisSeasons={arnisSeasons}
     client:load
   />
 </Layout>
