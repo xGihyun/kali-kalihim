@@ -7,10 +7,13 @@ import {
   ArnisTechniquesTable,
   SectionsTable,
 } from "@/drizzle/schema";
+import { getPersistedPairs } from "@/lib/power-cards";
 
 const arnisTechniques = await db.select().from(ArnisTechniquesTable);
 const sections = await db.select().from(SectionsTable);
 const arnisSeasons = await db.select().from(ArnisSeasonsTable);
+
+await getPersistedPairs()
 ---
 
 <Layout title="Matchmake">

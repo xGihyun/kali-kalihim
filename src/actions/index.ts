@@ -17,9 +17,10 @@ import { defineAction } from "astro:actions";
 import { ActionError } from "astro:actions";
 import { UserDetailsTable, UsersTable } from "@/drizzle/schema";
 import { MatchmakeSchema, MatchResultSchema } from "@/types/schemas/match";
-import { and, asc, desc, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq } from "drizzle-orm";
 import { matchmake } from "@/lib/matchmake";
 import { updateRating } from "@/lib/score";
+import type { PlayerScore } from "@/types/player";
 
 // TODO: Rollback transactions on error
 
@@ -138,7 +139,7 @@ export const server = {
 	matchResult: defineAction({
 		input: MatchResultSchema,
 		handler: async (data) => {
-			let playerTotalScores: { userId: string; score: number }[] = [];
+			let playerScores: PlayerScore[] = [];
 			let scoreDiff = 0;
 
 			await db.transaction(async (tx) => {
@@ -167,13 +168,13 @@ export const server = {
 						scoreDiff -= currentScore;
 					}
 
-					console.log("Score Diff:", scoreDiff);
-
-					playerTotalScores.push({
+					playerScores.push({
 						userId: result.userId,
 						score: currentScore,
 					});
 				}
+
+				console.log("Score Diff:", scoreDiff);
 
 				// Players have the same score (draw)
 				if (scoreDiff === 0) {
@@ -181,9 +182,9 @@ export const server = {
 					return;
 				}
 
-				let winner =
-					scoreDiff > 0 ? playerTotalScores[0] : playerTotalScores[1];
-				let loser = scoreDiff > 0 ? playerTotalScores[1] : playerTotalScores[0];
+				const winner =
+					scoreDiff > 0 ? playerScores[0] : playerScores[1];
+				const loser = scoreDiff > 0 ? playerScores[1] : playerScores[0];
 
 				await updateRating(tx, data.arnisSeasonId, winner, Math.abs(scoreDiff));
 				await updateRating(
@@ -192,9 +193,16 @@ export const server = {
 					loser,
 					Math.abs(scoreDiff) * -1,
 				);
+
+				await tx
+					.update(MatchesTable)
+					.set({ status: "done" })
+					.where(eq(MatchesTable.matchId, data.matchId));
+
+				// TODO: Add badges?
 			});
 
-      console.log("Success!")
+			console.log("Success!");
 		},
 	}),
 };

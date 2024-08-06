@@ -1,13 +1,21 @@
 import { db } from "@/drizzle/db";
 import { PlayerSeasonDetailsTable } from "@/drizzle/schema";
+import type { PlayerScore } from "@/types/player";
 import { and, eq, sql } from "drizzle-orm";
+import { ancientsDomain, doubleEdgedSword } from "./power-cards";
 
-type PlayerScore = {
-	userId: string;
-	score: number;
-};
+export async function updateRating(
+	tx = db,
+	arnisSeasonId: number,
+	player: PlayerScore,
+	scoreDiff: number,
+): Promise<void> {
+	const isProtected = await ancientsDomain(tx, player, scoreDiff);
 
-export async function updateRating(tx = db, arnisSeasonId: number, player: PlayerScore, scoreDiff: number) {
+	if (isProtected) {
+		return;
+	}
+
 	let [playerSeasonDetails] = await tx
 		.select({
 			playerSeasonDetailId: PlayerSeasonDetailsTable.playerSeasonDetailId,
@@ -20,10 +28,12 @@ export async function updateRating(tx = db, arnisSeasonId: number, player: Playe
 			),
 		);
 
+	const multiplier = await doubleEdgedSword(tx, player);
+
 	await tx
 		.update(PlayerSeasonDetailsTable)
 		.set({
-			rating: sql`rating + ${scoreDiff}`,
+			rating: sql`rating + ${scoreDiff * multiplier}`,
 		})
 		.where(
 			eq(
@@ -32,5 +42,5 @@ export async function updateRating(tx = db, arnisSeasonId: number, player: Playe
 			),
 		);
 
-  console.log("Updated rating:", player.userId, "New Rating:", scoreDiff)
+	console.log("Updated rating:", player.userId, "New Rating:", scoreDiff);
 }

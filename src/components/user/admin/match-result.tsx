@@ -1,4 +1,4 @@
-import { useFieldArray, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -21,12 +21,10 @@ import { Input } from "@/components/ui/input";
 import { actions } from "astro:actions";
 import {
 	MatchResultSchema,
-	type MatchOutput,
 	type MatchPlayer,
 	type MatchResultInput,
 	type RubricOutput,
 } from "@/types/schemas/match";
-import type { ArnisSeasonOutput } from "@/types/schemas/arnis";
 
 type Props = {
 	players: MatchPlayer[];
@@ -56,11 +54,6 @@ export default function MatchResult(props: Props): JSX.Element {
 			})),
 		},
 	});
-
-	//const { fields } = useFieldArray({
-	//	control: form.control,
-	//	name: "results",
-	//});
 
 	async function onSubmit(values: MatchResultInput) {
 		const toastId = toast.loading("Submitting...");
