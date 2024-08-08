@@ -127,7 +127,10 @@ export default function Register(): JSX.Element {
             <FormItem>
               <FormLabel>Middle Name</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input
+                  {...field}
+                  value={field.value === null ? undefined : field.value}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -212,9 +215,7 @@ export default function Register(): JSX.Element {
           )}
         />
 
-        <Button type="submit">
-          Submit
-        </Button>
+        <Button type="submit">Submit</Button>
       </form>
     </Form>
   );

@@ -1,6 +1,9 @@
+import type { FullNameInput } from "./schemas/auth";
+import type { MatchPlayerOutput } from "./schemas/match";
+
 export type Player = {
-  userId: string
-}
+  userId: string;
+};
 
 export type PlayerRating = {
   rating: number;
@@ -8,6 +11,13 @@ export type PlayerRating = {
 };
 
 export type PlayerScore = {
-	userId: string;
-	score: number;
+  userId: string;
+  score: number;
 };
+
+export type PlayerSwap = {
+  current: MatchPlayerOutput;
+  selected: MatchPlayerOutput;
+};
+
+export type PlayerLeaderboard = FullNameInput & PlayerRating;

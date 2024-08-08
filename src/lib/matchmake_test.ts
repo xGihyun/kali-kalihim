@@ -1,42 +1,42 @@
-import type { Player } from "@/types/player";
+import type { PlayerRating } from "@/types/player";
 import { matchmake } from "./matchmake";
 
-const players: Player[] = [
+const players: PlayerRating[] = [
   {
     rating: 85,
-    user_id: "foo",
+    userId: "foo",
   },
   {
     rating: 105,
-    user_id: "bar",
+    userId: "bar",
   },
   {
     rating: 125,
-    user_id: "baz",
+    userId: "baz",
   },
   {
     rating: 127,
-    user_id: "e",
+    userId: "e",
   },
   {
     rating: 130,
-    user_id: "f",
+    userId: "f",
   },
   {
     rating: 59,
-    user_id: "a",
+    userId: "a",
   },
   {
     rating: 80,
-    user_id: "b",
+    userId: "b",
   },
   {
     rating: 97,
-    user_id: "c",
+    userId: "c",
   },
   {
     rating: 100,
-    user_id: "d",
+    userId: "d",
   },
 ];
 

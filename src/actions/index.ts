@@ -17,10 +17,18 @@ import { defineAction } from "astro:actions";
 import { ActionError } from "astro:actions";
 import { UserDetailsTable, UsersTable } from "@/drizzle/schema";
 import { MatchmakeSchema, MatchResultSchema } from "@/types/schemas/match";
-import { and, asc, desc, eq } from "drizzle-orm";
+import {
+	and,
+	asc,
+	desc,
+	eq,
+	inArray,
+	notInArray,
+} from "drizzle-orm";
 import { matchmake } from "@/lib/matchmake";
 import { updateRating } from "@/lib/score";
 import type { PlayerScore } from "@/types/player";
+import { getPersistedPairs, getPersistedPlayers } from "@/lib/power-cards";
 
 // TODO: Rollback transactions on error
 
@@ -51,6 +59,8 @@ export const server = {
 					birthDate: birthDate.toDateString(),
 					...userDetails,
 				});
+
+				// TODO: Only players have power cards
 
 				const powerCards = await tx
 					.select({ powerCardId: PowerCardsTable.powerCardId })
@@ -98,6 +108,8 @@ export const server = {
 			console.log("Matchmaking...");
 
 			await db.transaction(async (tx) => {
+				const persistedPlayers = await getPersistedPlayers(tx);
+
 				const players = await tx
 					.select({
 						userId: PlayerSeasonDetailsTable.userId,
@@ -108,16 +120,25 @@ export const server = {
 						and(
 							eq(PlayerSeasonDetailsTable.sectionId, data.sectionId),
 							eq(PlayerSeasonDetailsTable.arnisSeasonId, data.arnisSeasonId),
+							notInArray(
+								PlayerSeasonDetailsTable.userId,
+								persistedPlayers.map((player) => player.userId),
+							),
 						),
 					)
 					.orderBy(asc(PlayerSeasonDetailsTable.rating));
 
 				const matches = matchmake(players);
+				const persistedPairs = getPersistedPairs(persistedPlayers);
+
+				matches.push(...persistedPairs);
+
+				console.log("Matches:", matches);
 
 				for (const pairs of matches) {
 					const [match] = await tx
 						.insert(MatchesTable)
-						.values({ cardBattleDuration: "6" })
+						.values({ cardBattleDuration: "6 hours" })
 						.returning({ matchId: MatchesTable.matchId });
 
 					await tx.insert(MatchArnisTechniquesTable).values({
@@ -131,6 +152,20 @@ export const server = {
 							.values({ matchId: match.matchId, userId: player.userId });
 					}
 				}
+
+				await tx
+					.update(PlayerPowerCardsTable)
+					.set({ status: "activated" })
+					.where(
+						and(
+							eq(PlayerPowerCardsTable.status, "active"),
+							eq(PlayerPowerCardsTable.powerCardId, 4),
+							inArray(
+								PlayerPowerCardsTable.userId,
+								persistedPlayers.map((player) => player.userId),
+							),
+						),
+					);
 			});
 
 			console.log("Successful matchmaking.");
@@ -182,8 +217,7 @@ export const server = {
 					return;
 				}
 
-				const winner =
-					scoreDiff > 0 ? playerScores[0] : playerScores[1];
+				const winner = scoreDiff > 0 ? playerScores[0] : playerScores[1];
 				const loser = scoreDiff > 0 ? playerScores[1] : playerScores[0];
 
 				await updateRating(tx, data.arnisSeasonId, winner, Math.abs(scoreDiff));
