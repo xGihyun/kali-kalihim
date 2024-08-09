@@ -3,17 +3,13 @@ import type { PlayerLeaderboard } from "@/types/player";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
-  TableHead,
-  TableHeader,
   TableRow,
 } from "@/components/ui/table";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -24,30 +20,45 @@ type Props = {
 
 export default function Component(props: Props): JSX.Element {
   return (
-    <Card>
-      <CardHeader>
+    <Card className="bg-background pb-0">
+      <CardHeader className="bg-background-2">
         <CardTitle>Top Players</CardTitle>
-        <CardDescription>Top players on the current season</CardDescription>
+        <CardDescription>Top players for the current season</CardDescription>
       </CardHeader>
-      <CardContent>
-        <Table>
-          <TableBody className="">
+      <CardContent className="px-0 bg-background pb-0">
+        <Table className="border-spacing-y-1 border-separate">
+          <TableBody>
             {props.players.map((player, i) => {
               const name = `${player.firstName} ${player.lastName}`;
 
               return (
-                <TableRow>
-                  <TableCell>
-                    #{i + 1} {name}
+                <TableRow
+                  className="p-6 border-none odd:bg-card/75 even:bg-background-2/75"
+                  key={player.userId}
+                >
+                  <TableCell className="pl-6 max-w-min text-lg">
+                    #{i + 1}
                   </TableCell>
-                  <TableCell>{player.rating}</TableCell>
+                  <TableCell>
+                    <a
+                      href={`/users/${player.userId}`}
+                      className="text-lg hover:underline max-w-fit block font-jost-medium text-primary"
+                    >
+                      {name}
+                    </a>
+                    <span className="text-sm text-muted-foreground">
+                      St. {player.sectionName}
+                    </span>
+                  </TableCell>
+                  <TableCell className="pr-6 text-lg font-jost-medium">
+                    {player.rating} pts.
+                  </TableCell>
                 </TableRow>
               );
             })}
           </TableBody>
         </Table>
       </CardContent>
-      <CardFooter></CardFooter>
     </Card>
   );
 }

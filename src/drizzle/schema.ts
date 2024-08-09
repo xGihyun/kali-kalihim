@@ -181,7 +181,7 @@ export const ArnisTechniquesTable = pgTable("arnis_techniques", {
 	arnisTechniqueId: smallserial("arnis_technique_id").primaryKey(),
 
 	name: text("name").notNull(),
-	technique_type: arnisTechniqueTypeEnum("technique_type").notNull(),
+	techniqueType: arnisTechniqueTypeEnum("technique_type").notNull(),
 	videoUrl: text("video_url"),
 });
 

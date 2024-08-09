@@ -6,6 +6,7 @@ import type {
 import { z } from "astro/zod";
 import type { InferSelectModel } from "drizzle-orm";
 import type { FullNameInput } from "./auth";
+import type { ArnisTechniqueOutput } from "./arnis";
 
 export const MatchmakeSchema = z.object({
   sectionId: z.string(),
@@ -46,3 +47,13 @@ export type RubricOutput = InferSelectModel<typeof RubricsTable>;
 export type MatchOutput = InferSelectModel<typeof MatchesTable>;
 
 export type MatchPlayer = Omit<MatchPlayerOutput, "matchId"> & FullNameInput;
+
+export type MatchRowData = {
+  players: (MatchPlayer & { score: number })[];
+  arnisTechniques: Omit<
+    ArnisTechniqueOutput,
+    "arnisTechniqueId" | "videoUrl"
+  >[];
+  finishedAt: Date;
+  matchId: string;
+};

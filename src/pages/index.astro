@@ -3,14 +3,23 @@ import Layout from "@/components/layouts/layout.astro";
 import UserProfile from "@/components/user/profile";
 import UserChart from "@/components/user/admin/charts/user";
 import TopPlayers from "@/components/user/admin/top-players";
+import Matches from "@/components/user/admin/matches";
 import { db } from "@/drizzle/db";
 import {
   ArnisSeasonsTable,
+  ArnisTechniquesTable,
+  MatchArnisTechniquesTable,
+  MatchCommentsTable,
+  MatchesTable,
+  MatchPlayerScoresTable,
+  MatchPlayersTable,
   PlayerSeasonDetailsTable,
+  SectionsTable,
   UserDetailsTable,
   UsersTable,
 } from "@/drizzle/schema";
-import { count, desc, eq } from "drizzle-orm";
+import { count, desc, eq, sql } from "drizzle-orm";
+import type { MatchRowData } from "@/types/schemas/match";
 
 const userRoles = await db
   .select({
@@ -33,15 +42,90 @@ const topPlayers = await db
     middleName: UserDetailsTable.middleName,
     lastName: UserDetailsTable.lastName,
     rating: PlayerSeasonDetailsTable.rating,
+    sectionName: SectionsTable.name,
   })
   .from(UserDetailsTable)
   .innerJoin(
     PlayerSeasonDetailsTable,
     eq(PlayerSeasonDetailsTable.userId, UserDetailsTable.userId),
   )
+  .innerJoin(
+    SectionsTable,
+    eq(SectionsTable.sectionId, PlayerSeasonDetailsTable.sectionId),
+  )
   .where(eq(PlayerSeasonDetailsTable.arnisSeasonId, latestSeason.arnisSeasonId))
   .orderBy(desc(PlayerSeasonDetailsTable.rating))
   .limit(5);
+
+async function getMatches(): Promise<MatchRowData[]> {
+  const data: MatchRowData[] = [];
+
+  await db.transaction(async (tx) => {
+    const matches = await tx
+      .select({
+        matchId: MatchesTable.matchId,
+        // TODO: Change this
+        finishedAt: sql<Date>`(current_timestamp)`,
+      })
+      .from(MatchesTable)
+      .where(eq(MatchesTable.status, "done"))
+      .limit(2);
+
+    for (const match of matches) {
+      const players = await tx
+        .select({
+          matchPlayerId: MatchPlayersTable.matchPlayerId,
+          userId: MatchPlayersTable.userId,
+          firstName: UserDetailsTable.firstName,
+          middleName: UserDetailsTable.middleName,
+          lastName: UserDetailsTable.lastName,
+          score: sql<number>`(cast(sum(${MatchPlayerScoresTable.score}) as int))`,
+        })
+        .from(MatchPlayersTable)
+        .innerJoin(
+          UserDetailsTable,
+          eq(UserDetailsTable.userId, MatchPlayersTable.userId),
+        )
+        .innerJoin(
+          MatchPlayerScoresTable,
+          eq(
+            MatchPlayerScoresTable.matchPlayerId,
+            MatchPlayersTable.matchPlayerId,
+          ),
+        )
+        .where(eq(MatchPlayersTable.matchId, match.matchId))
+        .groupBy(
+          MatchPlayerScoresTable.matchPlayerId,
+          MatchPlayersTable.matchPlayerId,
+          UserDetailsTable.firstName,
+          UserDetailsTable.middleName,
+          UserDetailsTable.lastName,
+        );
+
+      const techniques = await tx
+        .select({
+          name: ArnisTechniquesTable.name,
+          techniqueType: ArnisTechniquesTable.techniqueType,
+        })
+        .from(ArnisTechniquesTable)
+        .innerJoin(
+          MatchArnisTechniquesTable,
+          eq(MatchArnisTechniquesTable.matchId, match.matchId),
+        );
+
+      data.push({
+        players,
+        matchId: match.matchId,
+        finishedAt: match.finishedAt,
+        arnisTechniques: techniques,
+      });
+    }
+  });
+
+  return data;
+}
+
+const matches = await getMatches();
 ---
 
 <Layout title="Home">
@@ -50,4 +134,6 @@ const topPlayers = await db
   <UserChart userRoles={userRoles} client:load />
 
   <TopPlayers players={topPlayers} />
+
+  <Matches matches={matches} />
 </Layout>
