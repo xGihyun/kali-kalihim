@@ -7,6 +7,7 @@ import { z } from "astro/zod";
 import type { InferSelectModel } from "drizzle-orm";
 import type { FullNameInput } from "./auth";
 import type { ArnisTechniqueOutput } from "./arnis";
+import type { UserDetailsOutput } from "../user";
 
 export const MatchmakeSchema = z.object({
   sectionId: z.string(),
@@ -48,12 +49,18 @@ export type MatchOutput = InferSelectModel<typeof MatchesTable>;
 
 export type MatchPlayer = Omit<MatchPlayerOutput, "matchId"> & FullNameInput;
 
+export type UpcomingMatch = {
+  opponent: Omit<MatchPlayer, "matchPlayerId"> &
+  Pick<UserDetailsOutput, "avatarUrl" | "bannerUrl"> & { rating: number };
+  arnisTechnique: Pick<ArnisTechniqueOutput, "name" | "techniqueType">;
+  matchId: string;
+};
+
+export type PreviousMatch = UpcomingMatch;
+
 export type MatchRowData = {
   players: (MatchPlayer & { score: number })[];
-  arnisTechniques: Omit<
-    ArnisTechniqueOutput,
-    "arnisTechniqueId" | "videoUrl"
-  >[];
+  arnisTechniques: Pick<ArnisTechniqueOutput, "name" | "techniqueType">[];
   finishedAt: Date;
   matchId: string;
 };

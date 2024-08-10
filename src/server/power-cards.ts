@@ -3,10 +3,32 @@ import {
   MatchesTable,
   MatchPlayersTable,
   PlayerPowerCardsTable,
+  PowerCardsTable,
 } from "@/drizzle/schema";
 import type { Player, PlayerScore, PlayerSwap } from "@/types/player";
 import type { MatchPlayerOutput } from "@/types/schemas/match";
-import { and, desc, eq, exists, or, sql } from "drizzle-orm";
+import type { PlayerPowerCard } from "@/types/schemas/player";
+import { and, desc, eq, exists, isNotNull, or, sql } from "drizzle-orm";
+
+export async function getPowerCards(tx = db, userId: string): Promise<PlayerPowerCard[]> {
+  const powerCards = await tx
+    .select({
+      playerPowerCardId: PlayerPowerCardsTable.playerPowerCardId,
+      updatedAt: PlayerPowerCardsTable.updatedAt,
+      status: PlayerPowerCardsTable.status,
+      name: PowerCardsTable.name,
+      description: PowerCardsTable.description,
+      imageUrl: PowerCardsTable.imageUrl,
+    })
+    .from(PowerCardsTable)
+    .innerJoin(
+      PlayerPowerCardsTable,
+      eq(PlayerPowerCardsTable.powerCardId, PowerCardsTable.powerCardId),
+    )
+    .where(eq(PlayerPowerCardsTable.userId, userId));
+
+  return powerCards
+}
 
 export async function ancientsDomain(
   tx = db,
@@ -109,7 +131,7 @@ export async function getPersistedPlayers(
       tx
         .select({ createdAt: MatchesTable.createdAt })
         .from(MatchesTable)
-        .where(eq(MatchesTable.status, "done"))
+        .where(isNotNull(MatchesTable.finishedAt))
         .orderBy(desc(MatchesTable.createdAt))
         .limit(1),
     );

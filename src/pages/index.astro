@@ -1,139 +1,59 @@
 ---
 import Layout from "@/components/layouts/layout.astro";
 import UserProfile from "@/components/user/profile";
-import UserChart from "@/components/user/admin/charts/user";
-import TopPlayers from "@/components/user/admin/top-players";
-import Matches from "@/components/user/admin/matches";
+import Matches from "@/components/user/matches";
+import PowerCards from "@/components/user/power-cards";
 import { db } from "@/drizzle/db";
-import {
-  ArnisSeasonsTable,
-  ArnisTechniquesTable,
-  MatchArnisTechniquesTable,
-  MatchCommentsTable,
-  MatchesTable,
-  MatchPlayerScoresTable,
-  MatchPlayersTable,
-  PlayerSeasonDetailsTable,
-  SectionsTable,
-  UserDetailsTable,
-  UsersTable,
-} from "@/drizzle/schema";
-import { count, desc, eq, sql } from "drizzle-orm";
-import type { MatchRowData } from "@/types/schemas/match";
+import { getPowerCards } from "@/server/power-cards";
+import { getPreviousMatches, getUpcomingMatch } from "@/server/matches";
+import { ArnisSeasonsTable } from "@/drizzle/schema";
+import { desc } from "drizzle-orm";
+import type { PlayerPowerCard } from "@/types/schemas/player";
+import type { PreviousMatch, UpcomingMatch } from "@/types/schemas/match";
 
-const userRoles = await db
-  .select({
-    role: UsersTable.role,
-    count: count(UsersTable.role),
-  })
-  .from(UsersTable)
-  .groupBy(UsersTable.role);
+// TODO: Remove this once proper auth is implemented
+//const currentUser = "b00d9f00-0b8a-478d-8240-fa7090d06fb4";
+const currentUser = "477bb83d-4752-4afa-acb2-1f9a9e0172f4";
 
-const [latestSeason] = await db
-  .select({ arnisSeasonId: ArnisSeasonsTable.arnisSeasonId })
-  .from(ArnisSeasonsTable)
-  .orderBy(desc(ArnisSeasonsTable.createdAt))
-  .limit(1);
+type LoadData = {
+  powerCards: PlayerPowerCard[];
+  upcomingMatch: UpcomingMatch | null;
+  previousMatches: PreviousMatch[];
+};
 
-const topPlayers = await db
-  .select({
-    userId: UserDetailsTable.userId,
-    firstName: UserDetailsTable.firstName,
-    middleName: UserDetailsTable.middleName,
-    lastName: UserDetailsTable.lastName,
-    rating: PlayerSeasonDetailsTable.rating,
-    sectionName: SectionsTable.name,
-  })
-  .from(UserDetailsTable)
-  .innerJoin(
-    PlayerSeasonDetailsTable,
-    eq(PlayerSeasonDetailsTable.userId, UserDetailsTable.userId),
-  )
-  .innerJoin(
-    SectionsTable,
-    eq(SectionsTable.sectionId, PlayerSeasonDetailsTable.sectionId),
-  )
-  .where(eq(PlayerSeasonDetailsTable.arnisSeasonId, latestSeason.arnisSeasonId))
-  .orderBy(desc(PlayerSeasonDetailsTable.rating))
-  .limit(5);
+const data: LoadData = await db.transaction(async (tx) => {
+  const [latestSeason] = await tx
+    .select({ arnisSeasonId: ArnisSeasonsTable.arnisSeasonId })
+    .from(ArnisSeasonsTable)
+    .orderBy(desc(ArnisSeasonsTable.createdAt))
+    .limit(1);
 
-async function getMatches(): Promise<MatchRowData[]> {
-  const data: MatchRowData[] = [];
+  const powerCards = await getPowerCards(tx, currentUser);
+  const upcomingMatch = await getUpcomingMatch(
+    tx,
+    currentUser,
+    latestSeason.arnisSeasonId,
+  );
+  const previousMatches = await getPreviousMatches(
+    tx,
+    currentUser,
+    latestSeason.arnisSeasonId,
+  );
 
-  await db.transaction(async (tx) => {
-    const matches = await tx
-      .select({
-        matchId: MatchesTable.matchId,
-        // TODO: Change this
-        finishedAt: sql<Date>`(current_timestamp)`,
-      })
-      .from(MatchesTable)
-      .where(eq(MatchesTable.status, "done"))
-      .limit(2);
-
-    for (const match of matches) {
-      const players = await tx
-        .select({
-          matchPlayerId: MatchPlayersTable.matchPlayerId,
-          userId: MatchPlayersTable.userId,
-          firstName: UserDetailsTable.firstName,
-          middleName: UserDetailsTable.middleName,
-          lastName: UserDetailsTable.lastName,
-          score: sql<number>`(cast(sum(${MatchPlayerScoresTable.score}) as int))`,
-        })
-        .from(MatchPlayersTable)
-        .innerJoin(
-          UserDetailsTable,
-          eq(UserDetailsTable.userId, MatchPlayersTable.userId),
-        )
-        .innerJoin(
-          MatchPlayerScoresTable,
-          eq(
-            MatchPlayerScoresTable.matchPlayerId,
-            MatchPlayersTable.matchPlayerId,
-          ),
-        )
-        .where(eq(MatchPlayersTable.matchId, match.matchId))
-        .groupBy(
-          MatchPlayerScoresTable.matchPlayerId,
-          MatchPlayersTable.matchPlayerId,
-          UserDetailsTable.firstName,
-          UserDetailsTable.middleName,
-          UserDetailsTable.lastName,
-        );
-
-      const techniques = await tx
-        .select({
-          name: ArnisTechniquesTable.name,
-          techniqueType: ArnisTechniquesTable.techniqueType,
-        })
-        .from(ArnisTechniquesTable)
-        .innerJoin(
-          MatchArnisTechniquesTable,
-          eq(MatchArnisTechniquesTable.matchId, match.matchId),
-        );
-
-      data.push({
-        players,
-        matchId: match.matchId,
-        finishedAt: match.finishedAt,
-        arnisTechniques: techniques,
-      });
-    }
-  });
-
-  return data;
-}
-
-const matches = await getMatches();
+  return {
+    powerCards,
+    upcomingMatch,
+    previousMatches,
+  };
+});
 ---
 
 <Layout title="Home">
   <UserProfile />
 
-  <UserChart userRoles={userRoles} client:load />
+  <PowerCards powerCards={data.powerCards} />
 
-  <TopPlayers players={topPlayers} />
-
-  <Matches matches={matches} />
+  <Matches
+    match={{ upcoming: data.upcomingMatch, previous: data.previousMatches }}
+  />
 </Layout>

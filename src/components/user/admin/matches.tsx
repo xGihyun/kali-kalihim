@@ -14,6 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import type { MatchRowData } from "@/types/schemas/match";
+import { format } from "date-fns";
 
 type Props = {
   matches: MatchRowData[];
@@ -21,15 +22,14 @@ type Props = {
 
 export default function Component(props: Props): JSX.Element {
   return (
-    <Card className="bg-background pb-0">
-      <CardHeader className="bg-background-2">
-        <CardTitle>Top Players</CardTitle>
-        <CardDescription>Top players for the current season</CardDescription>
+    <Card className="pb-0">
+      <CardHeader>
+        <CardTitle>Recent Matches</CardTitle>
       </CardHeader>
       <CardContent className="px-0 bg-background pb-0">
         <Table className="border-spacing-y-1 border-separate">
           <TableHeader>
-            <TableRow>
+            <TableRow className="pointer-events-none">
               <TableHead className="pl-6">Players</TableHead>
               <TableHead>Scores</TableHead>
               <TableHead>Skill</TableHead>
@@ -51,7 +51,8 @@ export default function Component(props: Props): JSX.Element {
                       return (
                         <a
                           href={`/users/${player.userId}`}
-                          className="text-lg hover:underline max-w-fit block font-jost-medium text-primary"
+                          className="text-lg hover:underline max-w-fit block"
+                          key={player.userId}
                         >
                           {name}
                         </a>
@@ -60,12 +61,14 @@ export default function Component(props: Props): JSX.Element {
                   </TableCell>
                   <TableCell className="text-lg">
                     {match.players.map((player) => (
-                      <p>{player.score}</p>
+                      <p key={player.userId}>{player.score}</p>
                     ))}
                   </TableCell>
-                  <TableCell className="text-lg">{match.arnisTechniques[0].name}</TableCell>
+                  <TableCell className="text-lg">
+                    {match.arnisTechniques[0].name}
+                  </TableCell>
                   <TableCell className="pr-6 text-lg text-right">
-                    {match.finishedAt.toString()}
+                    {format(match.finishedAt, 'MMMM d, yyyy - hh:mm a')}
                   </TableCell>
                 </TableRow>
               );

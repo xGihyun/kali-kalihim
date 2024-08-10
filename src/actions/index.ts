@@ -25,10 +25,10 @@ import {
 	inArray,
 	notInArray,
 } from "drizzle-orm";
-import { matchmake } from "@/lib/matchmake";
-import { updateRating } from "@/lib/score";
+import { matchmake } from "@/server/admin/matchmake";
+import { updateRating } from "@/server/admin/score";
 import type { PlayerScore } from "@/types/player";
-import { getPersistedPairs, getPersistedPlayers } from "@/lib/power-cards";
+import { getPersistedPairs, getPersistedPlayers } from "@/server/power-cards";
 
 // TODO: Rollback transactions on error
 
@@ -230,7 +230,7 @@ export const server = {
 
 				await tx
 					.update(MatchesTable)
-					.set({ status: "done" })
+					.set({ finishedAt: new Date() })
 					.where(eq(MatchesTable.matchId, data.matchId));
 
 				// TODO: Add badges?

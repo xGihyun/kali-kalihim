@@ -1,0 +1,53 @@
+---
+import Layout from "@/components/layouts/layout.astro";
+import UserChart from "@/components/user/admin/charts/user";
+import TopPlayers from "@/components/user/admin/top-players";
+import Matches from "@/components/user/admin/matches";
+import type { UserRoleCount } from "@/types/user";
+import type { PlayerLeaderboard } from "@/types/player";
+import type { MatchRowData } from "@/types/schemas/match";
+import { db } from "@/drizzle/db";
+import { ArnisSeasonsTable, UsersTable } from "@/drizzle/schema";
+import { count, desc } from "drizzle-orm";
+import { getTopPlayers } from "@/server/players";
+import { getRecentMatches } from "@/server/admin/matches";
+
+type LoadData = {
+  userRoles: UserRoleCount[];
+  topPlayers: PlayerLeaderboard[];
+  recentMatches: MatchRowData[];
+};
+
+const data: LoadData = await db.transaction(async (tx) => {
+  const userRoles = await tx
+    .select({
+      role: UsersTable.role,
+      count: count(UsersTable.role),
+    })
+    .from(UsersTable)
+    .groupBy(UsersTable.role);
+
+  const [latestSeason] = await tx
+    .select({ arnisSeasonId: ArnisSeasonsTable.arnisSeasonId })
+    .from(ArnisSeasonsTable)
+    .orderBy(desc(ArnisSeasonsTable.createdAt))
+    .limit(1);
+
+  const topPlayers = await getTopPlayers(tx, latestSeason.arnisSeasonId);
+  const recentMatches = await getRecentMatches(tx);
+
+  return {
+    userRoles,
+    topPlayers,
+    recentMatches,
+  };
+});
+---
+
+<Layout title="Dashboard">
+  <UserChart userRoles={data.userRoles} client:load />
+
+  <TopPlayers players={data.topPlayers} />
+
+  <Matches matches={data.recentMatches} />
+</Layout>

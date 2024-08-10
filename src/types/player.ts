@@ -1,6 +1,5 @@
 import type { FullNameInput } from "./schemas/auth";
 import type { MatchPlayerOutput } from "./schemas/match";
-import type { SectionOutput } from "./schemas/player";
 
 export type Player = {
   userId: string;
