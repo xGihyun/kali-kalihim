@@ -20,8 +20,8 @@ type Props = {
 
 export default function Component(props: Props): JSX.Element {
   return (
-    <Card className="bg-background pb-0">
-      <CardHeader className="bg-background-2">
+    <Card >
+      <CardHeader >
         <CardTitle>Top Players</CardTitle>
         <CardDescription>Top players for the current season</CardDescription>
       </CardHeader>
@@ -33,7 +33,7 @@ export default function Component(props: Props): JSX.Element {
 
               return (
                 <TableRow
-                  className="p-6 border-none odd:bg-card/75 even:bg-background-2/75"
+                  className="border-none odd:bg-card/75 even:bg-background-2/75"
                   key={player.userId}
                 >
                   <TableCell className="pl-6 max-w-min text-lg">

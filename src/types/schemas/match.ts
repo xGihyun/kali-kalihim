@@ -49,14 +49,14 @@ export type MatchOutput = InferSelectModel<typeof MatchesTable>;
 
 export type MatchPlayer = Omit<MatchPlayerOutput, "matchId"> & FullNameInput;
 
-export type UpcomingMatch = {
+export type UpcomingMatchResponseData = {
   opponent: Omit<MatchPlayer, "matchPlayerId"> &
   Pick<UserDetailsOutput, "avatarUrl" | "bannerUrl"> & { rating: number };
   arnisTechnique: Pick<ArnisTechniqueOutput, "name" | "techniqueType">;
   matchId: string;
 };
 
-export type PreviousMatch = UpcomingMatch;
+export type PreviousMatchResponseData = UpcomingMatchResponseData;
 
 export type MatchRowData = {
   players: (MatchPlayer & { score: number })[];

@@ -1,18 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { PreviousMatch, UpcomingMatch } from "@/types/schemas/match";
-
-type Match = {
-  upcoming: UpcomingMatch | null;
-  previous: PreviousMatch[];
-};
+import type { UpcomingMatchResponseData } from "@/types/schemas/match";
 
 type Props = {
-  match: Match;
+  match: UpcomingMatchResponseData | null;
 };
 
 export default function Component(props: Props): JSX.Element {
-
-  console.log("Match:", props.match)
+  console.log("Upcoming Match:", props.match);
 
   return (
     <Card>
@@ -20,7 +14,11 @@ export default function Component(props: Props): JSX.Element {
         <CardTitle>Upcoming Match</CardTitle>
       </CardHeader>
       <CardContent>
-        <p>{props.match.upcoming === null ? "No Opponent" : props.match.upcoming.opponent.firstName}</p>
+        <p>
+          {props.match === null
+            ? "No Opponent"
+            : props.match.opponent.firstName}
+        </p>
       </CardContent>
     </Card>
   );

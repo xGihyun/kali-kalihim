@@ -10,6 +10,8 @@ import type { MatchPlayerOutput } from "@/types/schemas/match";
 import type { PlayerPowerCard } from "@/types/schemas/player";
 import { and, desc, eq, exists, isNotNull, or, sql } from "drizzle-orm";
 
+// TODO: Remove the hard-coded power card IDs and find a better way
+
 export async function getPowerCards(tx = db, userId: string): Promise<PlayerPowerCard[]> {
   const powerCards = await tx
     .select({
