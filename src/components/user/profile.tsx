@@ -2,7 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function Profile(): JSX.Element {
 	return (
-		<div className="bg-card border rounded-xl overflow-hidden">
+		<div className="bg-card border rounded-xl overflow-hidden min-w-[28rem]">
 			<div className="bg-primary w-full h-60"></div>
 
 			<div className="flex flex-col items-center w-full">
@@ -23,8 +23,8 @@ export default function Profile(): JSX.Element {
 				<h2 className="text-xl font-jost-semibold px-8 py-4 bg-background-2">
 					Rating
 				</h2>
-				<div className="px-8 py-4 grid grid-cols-3">
-					<div className="flex items-center gap-4">
+				<div className="px-8 py-4 flex gap-8 w-full">
+					<div className="flex items-center gap-4 w-full">
 						<RankBadge />
 						<div className="flex flex-col">
 							<span className="font-jost-medium text-foreground/75">

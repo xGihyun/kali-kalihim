@@ -8,10 +8,10 @@ import {
   UserDetailsTable,
 } from "@/drizzle/schema";
 import { eq, isNotNull, sql } from "drizzle-orm";
-import type { MatchRowData } from "@/types/schemas/match";
+import type { MatchResponseData } from "@/types/schemas/match";
 
-export async function getRecentMatches(tx = db): Promise<MatchRowData[]> {
-  const data: MatchRowData[] = [];
+export async function getRecentMatches(tx = db): Promise<MatchResponseData[]> {
+  const data: MatchResponseData[] = [];
 
   const matches = await tx
     .select({
@@ -19,8 +19,7 @@ export async function getRecentMatches(tx = db): Promise<MatchRowData[]> {
       finishedAt: MatchesTable.finishedAt,
     })
     .from(MatchesTable)
-    .where(isNotNull(MatchesTable.finishedAt))
-    .limit(2);
+    .where(isNotNull(MatchesTable.finishedAt));
 
   for (const match of matches) {
     const players = await tx
@@ -51,7 +50,8 @@ export async function getRecentMatches(tx = db): Promise<MatchRowData[]> {
         UserDetailsTable.firstName,
         UserDetailsTable.middleName,
         UserDetailsTable.lastName,
-      );
+      )
+      .limit(2);
 
     const techniques = await tx
       .select({

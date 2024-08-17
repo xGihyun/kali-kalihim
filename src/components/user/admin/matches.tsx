@@ -13,11 +13,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import type { MatchRowData } from "@/types/schemas/match";
+import type { MatchResponseData } from "@/types/schemas/match";
 import { format } from "date-fns";
 
 type Props = {
-  matches: MatchRowData[];
+  matches: MatchResponseData[];
 };
 
 export default function Component(props: Props): JSX.Element {

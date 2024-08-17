@@ -53,7 +53,7 @@ const data: LoadData = await db.transaction(async (tx) => {
   <div class="flex gap-4">
     <UserProfile />
 
-    <div class="flex flex-col gap-4">
+    <div class="flex w-full flex-col gap-4">
       <PowerCards powerCards={data.powerCards} />
       <UpcomingMatch match={data.upcomingMatch} />
       <PreviousMatches matches={data.previousMatches} />

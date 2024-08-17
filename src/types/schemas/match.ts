@@ -48,18 +48,30 @@ export type RubricOutput = InferSelectModel<typeof RubricsTable>;
 export type MatchOutput = InferSelectModel<typeof MatchesTable>;
 
 export type MatchPlayer = Omit<MatchPlayerOutput, "matchId"> & FullNameInput;
+export type MatchPlayerScore = MatchPlayer & { score: number };
+
+export type MatchOpponentResponseData = Omit<MatchPlayer, "matchPlayerId"> &
+  Pick<UserDetailsOutput, "avatarUrl" | "bannerUrl"> & { rating: number };
 
 export type UpcomingMatchResponseData = {
-  opponent: Omit<MatchPlayer, "matchPlayerId"> &
-  Pick<UserDetailsOutput, "avatarUrl" | "bannerUrl"> & { rating: number };
+  opponent: MatchOpponentResponseData;
   arnisTechnique: Pick<ArnisTechniqueOutput, "name" | "techniqueType">;
   matchId: string;
 };
 
-export type PreviousMatchResponseData = UpcomingMatchResponseData;
 
-export type MatchRowData = {
-  players: (MatchPlayer & { score: number })[];
+export enum Verdict {
+  Victory = "victory",
+  Defeat = "defeat",
+  Draw = "draw",
+}
+
+export type PreviousMatchResponseData = MatchResponseData & {
+  verdict: Verdict;
+};
+
+export type MatchResponseData = {
+  players: MatchPlayerScore[];
   arnisTechniques: Pick<ArnisTechniqueOutput, "name" | "techniqueType">[];
   finishedAt: Date;
   matchId: string;
