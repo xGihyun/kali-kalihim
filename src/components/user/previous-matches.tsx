@@ -11,7 +11,6 @@ type Props = {
 export default function Component(props: Props): JSX.Element {
   console.log("Previous Match:", props.matches);
   console.log("Techniques", props.matches[0].arnisTechniques);
-  const currentUser = "477bb83d-4752-4afa-acb2-1f9a9e0172f4";
 
   return (
     <Card>
@@ -22,12 +21,9 @@ export default function Component(props: Props): JSX.Element {
         <Table className="border-spacing-y-1 border-separate">
           <TableBody>
             {props.matches.map((match) => {
-              const opponent = match.players.filter(
-                (player) => player.userId !== currentUser,
-              )[0]!;
-              const opponentName = `${opponent.firstName} ${opponent.lastName}`;
+              const opponentName = `${match.opponent.firstName} ${match.opponent.lastName}`;
               const initials =
-                `${opponent.firstName[0]}${opponent.lastName[0]}`.toUpperCase();
+                `${match.opponent.firstName[0]}${match.opponent.lastName[0]}`.toUpperCase();
 
               return (
                 <TableRow
@@ -38,7 +34,7 @@ export default function Component(props: Props): JSX.Element {
                     <div className="flex gap-2 items-center relative z-20">
                       <Avatar className="shadow">
                         <AvatarImage
-                          src={opponent.avatarUrl ?? undefined}
+                          src={match.opponent.avatarUrl ?? undefined}
                         />
                         <AvatarFallback>{initials}</AvatarFallback>
                       </Avatar>
@@ -48,10 +44,6 @@ export default function Component(props: Props): JSX.Element {
                     <VerdictHighlight match={match} />
                   </TableCell>
                   <TableCell className="pr-6">
-                        {
-                        /*
-                         */
-                      }
                     <p className="text-lg font-jost-medium">
                       {match.arnisTechniques[0].name}
                     </p>

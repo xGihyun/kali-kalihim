@@ -1,7 +1,5 @@
 import type { Player, PlayerRating } from "@/types/player";
 
-// TODO: Exclude persisted players
-
 export function matchmake(
 	players: PlayerRating[],
 	bucketSize: number = 40,

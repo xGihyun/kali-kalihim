@@ -8,8 +8,10 @@ import {
   PlayerSeasonDetailsTable,
   UserDetailsTable,
 } from "@/drizzle/schema";
+import type { PlayerScore } from "@/types/player";
 import {
   Verdict,
+  type MatchOpponentResponseData,
   type MatchPlayerScore,
   type PreviousMatchResponseData,
   type UpcomingMatchResponseData,
@@ -55,10 +57,6 @@ export async function getUpcomingMatch(
     .with(upcomingMatchCTE)
     .select({
       matchId: MatchesTable.matchId,
-      arnisTechnique: {
-        name: ArnisTechniquesTable.name,
-        techniqueType: ArnisTechniquesTable.techniqueType,
-      },
       opponent: {
         userId: MatchPlayersTable.userId,
         rating: PlayerSeasonDetailsTable.rating,
@@ -70,17 +68,6 @@ export async function getUpcomingMatch(
       },
     })
     .from(MatchesTable)
-    .innerJoin(
-      MatchArnisTechniquesTable,
-      eq(MatchArnisTechniquesTable.matchId, MatchesTable.matchId),
-    )
-    .innerJoin(
-      ArnisTechniquesTable,
-      eq(
-        ArnisTechniquesTable.arnisTechniqueId,
-        MatchArnisTechniquesTable.arnisTechniqueId,
-      ),
-    )
     .innerJoin(
       MatchPlayersTable,
       eq(MatchPlayersTable.matchId, MatchesTable.matchId),
@@ -111,7 +98,27 @@ export async function getUpcomingMatch(
     return null;
   }
 
-  return match;
+  const techniques = await tx
+    .select({
+      name: ArnisTechniquesTable.name,
+      techniqueType: ArnisTechniquesTable.techniqueType,
+    })
+    .from(MatchArnisTechniquesTable)
+    .innerJoin(
+      ArnisTechniquesTable,
+      eq(
+        ArnisTechniquesTable.arnisTechniqueId,
+        MatchArnisTechniquesTable.arnisTechniqueId,
+      ),
+    )
+    .where(eq(MatchArnisTechniquesTable.matchId, match.matchId));
+
+  const upcomingMatch: UpcomingMatchResponseData = {
+    arnisTechniques: techniques,
+    ...match,
+  };
+
+  return upcomingMatch;
 }
 
 export async function getPreviousMatches(
@@ -142,11 +149,7 @@ export async function getPreviousMatches(
   for (const match of previousMatches) {
     const players = await tx
       .select({
-        matchPlayerId: MatchPlayersTable.matchPlayerId,
         userId: MatchPlayersTable.userId,
-        firstName: UserDetailsTable.firstName,
-        middleName: UserDetailsTable.middleName,
-        lastName: UserDetailsTable.lastName,
         score: sql<number>`(cast(sum(${MatchPlayerScoresTable.score}) as int))`,
       })
       .from(MatchPlayersTable)
@@ -171,6 +174,14 @@ export async function getPreviousMatches(
       )
       .limit(2);
 
+    const opponentScore = players.filter(
+      (player) => player.userId !== userId,
+    )[0];
+    const opponentData = await getOpponent(
+      tx,
+      opponentScore.userId,
+      arnisSeasonId,
+    );
     const techniques = await tx
       .select({
         name: ArnisTechniquesTable.name,
@@ -187,14 +198,34 @@ export async function getPreviousMatches(
       .where(eq(MatchArnisTechniquesTable.matchId, match.matchId));
 
     data.push({
-      players,
       matchId: match.matchId,
       finishedAt: match.finishedAt!,
       arnisTechniques: techniques,
       verdict: getPlayerMatchVerdict(players, userId),
+      opponent: opponentData,
     });
   }
 
+  //const previousMatchesCTE = tx.$with("previous_matches").as(
+  //  tx
+  //    .select({
+  //      matchId: MatchesTable.matchId,
+  //      finishedAt: MatchesTable.finishedAt,
+  //    })
+  //    .from(MatchesTable)
+  //    .innerJoin(
+  //      MatchPlayersTable,
+  //      eq(MatchPlayersTable.matchId, MatchesTable.matchId),
+  //    )
+  //    .where(
+  //      and(
+  //        isNotNull(MatchesTable.finishedAt),
+  //        eq(MatchesTable.matchId, MatchPlayersTable.matchId),
+  //        eq(MatchPlayersTable.userId, userId),
+  //      ),
+  //    ),
+  //);
+  //
   //const previousMatchesVerdictsCTE = tx.$with("previous_matches_verdicts").as(
   //  tx
   //    .select({
@@ -249,7 +280,7 @@ export async function getPreviousMatches(
   //      avatarUrl: UserDetailsTable.avatarUrl,
   //      bannerUrl: UserDetailsTable.bannerUrl,
   //    },
-  //    score: sql<number>`(cast(sum(${MatchPlayerScoresTable.score}) as int))`,
+  //    //score: sql<number>`(cast(sum(${MatchPlayerScoresTable.score}) as int))`,
   //  })
   //  .from(MatchesTable)
   //  .innerJoin(
@@ -315,7 +346,7 @@ export async function getPreviousMatches(
 }
 
 function getPlayerMatchVerdict(
-  players: MatchPlayerScore[],
+  players: PlayerScore[],
   userId: string,
 ): Verdict {
   let scoreDiff = 0;
@@ -339,4 +370,30 @@ function getPlayerMatchVerdict(
   }
 
   return Verdict.Defeat;
+}
+
+async function getOpponent(
+  tx = db,
+  userId: string,
+  arnisSeasonId: number,
+): Promise<MatchOpponentResponseData> {
+  const [opponent] = await tx
+    .select({
+      userId: UserDetailsTable.userId,
+      rating: PlayerSeasonDetailsTable.rating,
+      firstName: UserDetailsTable.firstName,
+      middleName: UserDetailsTable.middleName,
+      lastName: UserDetailsTable.lastName,
+      avatarUrl: UserDetailsTable.avatarUrl,
+      bannerUrl: UserDetailsTable.bannerUrl,
+    })
+    .from(UserDetailsTable)
+    .innerJoin(
+      PlayerSeasonDetailsTable,
+      eq(PlayerSeasonDetailsTable.userId, userId),
+    )
+    .where(eq(PlayerSeasonDetailsTable.arnisSeasonId, arnisSeasonId))
+    .limit(1);
+
+  return opponent;
 }

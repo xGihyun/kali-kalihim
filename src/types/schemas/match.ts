@@ -55,10 +55,9 @@ export type MatchOpponentResponseData = Omit<MatchPlayer, "matchPlayerId"> &
 
 export type UpcomingMatchResponseData = {
   opponent: MatchOpponentResponseData;
-  arnisTechnique: Pick<ArnisTechniqueOutput, "name" | "techniqueType">;
+  arnisTechniques: Pick<ArnisTechniqueOutput, "name" | "techniqueType">[];
   matchId: string;
 };
-
 
 export enum Verdict {
   Victory = "victory",
@@ -66,8 +65,9 @@ export enum Verdict {
   Draw = "draw",
 }
 
-export type PreviousMatchResponseData = MatchResponseData & {
+export type PreviousMatchResponseData = UpcomingMatchResponseData & {
   verdict: Verdict;
+  finishedAt: Date
 };
 
 export type MatchResponseData = {

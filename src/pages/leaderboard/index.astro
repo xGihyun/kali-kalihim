@@ -1,0 +1,38 @@
+---
+import Layout from "@/components/layouts/layout.astro";
+import { db } from "@/drizzle/db";
+import {
+  ArnisSeasonsTable,
+  PlayerSeasonDetailsTable,
+  SectionsTable,
+  UserDetailsTable,
+} from "@/drizzle/schema";
+import { getTopPlayers } from "@/server/players";
+import type { PlayerLeaderboardResponseData } from "@/types/player";
+import { desc, eq } from "drizzle-orm";
+import { DataTable } from "./data-table.tsx";
+import { columns } from "./columns";
+import Leaderboard from "./table.tsx"
+
+type LoadData = {
+  players: PlayerLeaderboardResponseData[];
+};
+
+const data: LoadData = await db.transaction(async (tx) => {
+  const [latestSeason] = await tx
+    .select({ arnisSeasonId: ArnisSeasonsTable.arnisSeasonId })
+    .from(ArnisSeasonsTable)
+    .orderBy(desc(ArnisSeasonsTable.createdAt))
+    .limit(1);
+
+  const players = await getTopPlayers(tx, latestSeason.arnisSeasonId, 20);
+
+  return {
+    players,
+  };
+});
+---
+
+<Layout>
+  <Leaderboard players={data.players} client:load />
+</Layout>

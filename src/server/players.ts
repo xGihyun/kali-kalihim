@@ -4,10 +4,15 @@ import {
   SectionsTable,
   UserDetailsTable,
 } from "@/drizzle/schema";
-import type { PlayerLeaderboard } from "@/types/player";
-import { desc, eq} from "drizzle-orm";
+import type { PlayerLeaderboardResponseData } from "@/types/player";
+import { desc, eq } from "drizzle-orm";
 
-export async function getTopPlayers(tx = db, arnisSeasonId: number, limit = 5): Promise<PlayerLeaderboard[]> {
+export async function getTopPlayers(
+  tx = db,
+  arnisSeasonId: number,
+  limit = 5,
+  offset = 0
+): Promise<PlayerLeaderboardResponseData[]> {
   const topPlayers = await tx
     .select({
       userId: UserDetailsTable.userId,
@@ -15,7 +20,9 @@ export async function getTopPlayers(tx = db, arnisSeasonId: number, limit = 5): 
       middleName: UserDetailsTable.middleName,
       lastName: UserDetailsTable.lastName,
       rating: PlayerSeasonDetailsTable.rating,
-      sectionName: SectionsTable.name,
+      section: {
+        name: SectionsTable.name,
+      },
     })
     .from(UserDetailsTable)
     .innerJoin(
@@ -26,11 +33,9 @@ export async function getTopPlayers(tx = db, arnisSeasonId: number, limit = 5): 
       SectionsTable,
       eq(SectionsTable.sectionId, PlayerSeasonDetailsTable.sectionId),
     )
-    .where(
-      eq(PlayerSeasonDetailsTable.arnisSeasonId, arnisSeasonId),
-    )
+    .where(eq(PlayerSeasonDetailsTable.arnisSeasonId, arnisSeasonId))
     .orderBy(desc(PlayerSeasonDetailsTable.rating))
     .limit(limit);
 
-  return topPlayers
+  return topPlayers;
 }
