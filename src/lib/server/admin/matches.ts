@@ -8,7 +8,7 @@ import {
   UserDetailsTable,
 } from "@/drizzle/schema";
 import { eq, isNotNull, sql } from "drizzle-orm";
-import type { MatchResponseData } from "@/types/schemas/match";
+import type { MatchResponseData } from "@/lib/types/match";
 
 export async function getRecentMatches(tx = db): Promise<MatchResponseData[]> {
   const data: MatchResponseData[] = [];

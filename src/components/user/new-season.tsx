@@ -1,7 +1,7 @@
 import {
 	PlayerSeasonSchema,
 	type PlayerSeasonInput,
-} from "@/types/schemas/auth";
+} from "@/lib/schemas/auth";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -23,10 +23,10 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { actions } from "astro:actions";
-import type { SectionOutput } from "@/types/schemas/player";
+import type { SectionModel } from "@/lib/types/player";
 
 type Props = {
-	sections: SectionOutput[];
+	sections: SectionModel[];
 };
 
 export default function NewSeason({ sections }: Props): JSX.Element {
@@ -42,7 +42,7 @@ export default function NewSeason({ sections }: Props): JSX.Element {
 		const toastId = toast.loading("Submitting...");
 		console.log("Values:", values);
 
-		const { error } = await actions.playerSeasonRegister.safe(values);
+		const { error } = await actions.playerSeasonRegister(values);
 
 		if (error) {
 			console.error("ERROR:", error);

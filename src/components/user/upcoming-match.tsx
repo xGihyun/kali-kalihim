@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { UpcomingMatchResponseData } from "@/types/schemas/match";
+import type { UpcomingMatchResponseData } from "@/lib/types/match";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 type Props = {

@@ -1,6 +1,6 @@
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Verdict, type PreviousMatchResponseData } from "@/types/schemas/match";
+import { Verdict, type PreviousMatchResponseData } from "@/lib/types/match";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 

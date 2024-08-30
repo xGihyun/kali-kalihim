@@ -1,4 +1,4 @@
-import type { PlayerLeaderboard } from "@/types/player";
+import type { PlayerLeaderboardResponseData } from "@/lib/types/player";
 
 import {
   Table,
@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/card";
 
 type Props = {
-  players: PlayerLeaderboard[];
+  players: PlayerLeaderboardResponseData[];
 };
 
 export default function Component(props: Props): JSX.Element {
@@ -47,7 +47,7 @@ export default function Component(props: Props): JSX.Element {
                       {name}
                     </a>
                     <span className="text-sm text-muted-foreground">
-                      St. {player.sectionName}
+                      St. {player.section.name}
                     </span>
                   </TableCell>
                   <TableCell className="pr-6 text-lg font-jost-medium">

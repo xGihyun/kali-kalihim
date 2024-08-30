@@ -1,5 +1,5 @@
-import type { PlayerRating } from "@/types/player";
-import { matchmake } from "../matchmakechmake";
+import type { PlayerRating } from "@/lib/types/player";
+import { matchmake } from "./matchmake";
 
 const players: PlayerRating[] = [
   {

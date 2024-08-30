@@ -13,7 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import type { MatchResponseData } from "@/types/schemas/match";
+import type { MatchResponseData } from "@/lib/types/match";
 import { format } from "date-fns";
 
 type Props = {

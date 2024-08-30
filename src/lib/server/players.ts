@@ -4,7 +4,7 @@ import {
   SectionsTable,
   UserDetailsTable,
 } from "@/drizzle/schema";
-import type { PlayerLeaderboardResponseData } from "@/types/player";
+import type { PlayerLeaderboardResponseData } from "@/lib/types/player";
 import { desc, eq } from "drizzle-orm";
 
 export async function getTopPlayers(

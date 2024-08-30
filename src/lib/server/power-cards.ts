@@ -5,9 +5,9 @@ import {
   PlayerPowerCardsTable,
   PowerCardsTable,
 } from "@/drizzle/schema";
-import type { Player, PlayerScore, PlayerSwap } from "@/types/player";
-import type { MatchPlayerOutput } from "@/types/schemas/match";
-import type { PlayerPowerCard } from "@/types/schemas/player";
+import type { Player, PlayerScore, PlayerSwap } from "@/lib/types/player";
+import type { MatchPlayerModel } from "@/lib/types/match";
+import type { PlayerPowerCard } from "@/lib/types/player";
 import { and, desc, eq, exists, isNotNull, or, sql } from "drizzle-orm";
 
 // TODO: Remove the hard-coded power card IDs and find a better way
@@ -126,7 +126,7 @@ export async function extraWind(
 
 export async function getPersistedPlayers(
   tx = db,
-): Promise<MatchPlayerOutput[]> {
+): Promise<MatchPlayerModel[]> {
   const latestMatchDateCTE = tx
     .$with("latest_match_date")
     .as(
@@ -182,7 +182,7 @@ export async function getPersistedPlayers(
   return matchPlayers;
 }
 
-export function getPersistedPairs(players: MatchPlayerOutput[]): Player[][] {
+export function getPersistedPairs(players: MatchPlayerModel[]): Player[][] {
   console.log("Getting persisted pairs...");
 
   const matches = new Map<string, Player[]>([]);

@@ -7,12 +7,12 @@ import {
   SectionsTable,
   UserDetailsTable,
 } from "@/drizzle/schema";
-import { getTopPlayers } from "@/server/players";
-import type { PlayerLeaderboardResponseData } from "@/types/player";
+import type { PlayerLeaderboardResponseData } from "@/lib/types/player";
 import { desc, eq } from "drizzle-orm";
 import { DataTable } from "./data-table.tsx";
 import { columns } from "./columns";
 import Leaderboard from "./table.tsx"
+import { getTopPlayers } from "@/lib/server/players";
 
 type LoadData = {
   players: PlayerLeaderboardResponseData[];

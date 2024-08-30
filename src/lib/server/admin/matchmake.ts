@@ -1,4 +1,4 @@
-import type { Player, PlayerRating } from "@/types/player";
+import type { Player, PlayerRating } from "@/lib/types/player";
 
 export function matchmake(
 	players: PlayerRating[],

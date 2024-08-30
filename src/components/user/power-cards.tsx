@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { PlayerPowerCard } from "@/types/schemas/player";
+import type { PlayerPowerCard } from "@/lib/types/player";
 
 type Props = {
   powerCards: PlayerPowerCard[];

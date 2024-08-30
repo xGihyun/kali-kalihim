@@ -8,15 +8,14 @@ import {
   PlayerSeasonDetailsTable,
   UserDetailsTable,
 } from "@/drizzle/schema";
-import type { PlayerScore } from "@/types/player";
+import type { PlayerScore } from "@/lib/types/player";
 import {
   Verdict,
   type MatchOpponentResponseData,
   type MatchPlayerScore,
   type PreviousMatchResponseData,
   type UpcomingMatchResponseData,
-} from "@/types/schemas/match";
-import { log } from "console";
+} from "@/lib/types/match";
 import {
   and,
   desc,

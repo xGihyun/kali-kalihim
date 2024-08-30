@@ -1,4 +1,4 @@
-import type { PlayerLeaderboardResponseData } from "@/types/player"
+import type { PlayerLeaderboardResponseData } from "@/lib/types/player"
 import type { ColumnDef } from "@tanstack/react-table"
 
 export const columns: ColumnDef<PlayerLeaderboardResponseData>[] = [

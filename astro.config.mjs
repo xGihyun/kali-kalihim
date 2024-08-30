@@ -11,7 +11,6 @@ export default defineConfig({
     applyBaseStyles: false
   })],
   experimental: {
-    actions: true,
     env: {
       schema: {
         DB_URL: envField.string({

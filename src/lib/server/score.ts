@@ -1,8 +1,8 @@
 import { db } from "@/drizzle/db";
 import { PlayerSeasonDetailsTable } from "@/drizzle/schema";
-import type { PlayerScore } from "@/types/player";
+import type { PlayerScore } from "@/lib/types/player";
 import { and, eq, sql } from "drizzle-orm";
-import { ancientsDomain, doubleEdgedSword } from "../power-cards";
+import { ancientsDomain, doubleEdgedSword } from "./power-cards";
 
 export async function updateRating(
 	tx = db,

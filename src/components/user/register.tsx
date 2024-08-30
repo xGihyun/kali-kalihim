@@ -1,4 +1,4 @@
-import { RegisterSchema, type RegisterInput } from "@/types/schemas/auth";
+import { RegisterSchema, type RegisterInput } from "@/lib/schemas/auth";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -47,7 +47,7 @@ export default function Register(): JSX.Element {
     const toastId = toast.loading("Submitting...");
     console.log("Values:", values);
 
-    const { error } = await actions.register.safe(values);
+    const { error } = await actions.register(values);
 
     if (error) {
       console.error("ERROR:", error);

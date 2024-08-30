@@ -1,4 +1,4 @@
-import { MatchmakeSchema, type MatchmakeInput } from "@/types/schemas/match";
+import { MatchmakeSchema, type MatchmakeInput } from "@/lib/schemas/match";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -20,15 +20,15 @@ import {
 } from "@/components/ui/select";
 import { actions } from "astro:actions";
 import type {
-  ArnisSeasonOutput,
-  ArnisTechniqueOutput,
-} from "@/types/schemas/arnis";
-import type { SectionOutput } from "@/types/schemas/player";
+  ArnisSeasonModel,
+  ArnisTechniqueModel,
+} from "@/lib/types/arnis";
+import type { SectionModel } from "@/lib/types/player";
 
 type Props = {
-  arnisTechniques: Omit<ArnisTechniqueOutput, "video_url">[];
-  sections: SectionOutput[];
-  arnisSeasons: ArnisSeasonOutput[];
+  arnisTechniques: Omit<ArnisTechniqueModel, "video_url">[];
+  sections: SectionModel[];
+  arnisSeasons: ArnisSeasonModel[];
 };
 
 export default function Matchmake(props: Props): JSX.Element {
@@ -43,7 +43,7 @@ export default function Matchmake(props: Props): JSX.Element {
     const toastId = toast.loading("Matchmaking...");
     console.log("Values:", values);
 
-    const { error } = await actions.matchmake.safe(values);
+    const { error } = await actions.matchmake(values);
 
     if (error) {
       console.error("ERROR:", error);

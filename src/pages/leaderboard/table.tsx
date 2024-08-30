@@ -1,4 +1,4 @@
-import type { PlayerLeaderboardResponseData } from "@/types/player";
+import type { PlayerLeaderboardResponseData } from "@/lib/types/player";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
 

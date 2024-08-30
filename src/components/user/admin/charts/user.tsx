@@ -15,7 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import type { UserRoleCount } from "@/types/user";
+import type { UserRoleCount } from "@/lib/types/user";
 
 // TODO: Replace with legit data
 

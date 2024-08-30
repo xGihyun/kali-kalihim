@@ -11,12 +11,12 @@ import {
 	PowerCardsTable,
 	PlayerPowerCardsTable,
 } from "@/drizzle/schema";
-import { PlayerSeasonSchema, RegisterSchema } from "@/types/schemas/auth";
-import { SectionSchema } from "@/types/schemas/player";
+import { PlayerSeasonSchema, RegisterSchema } from "@/lib/schemas/auth";
+import { SectionSchema } from "@/lib/schemas/player";
 import { defineAction } from "astro:actions";
 import { ActionError } from "astro:actions";
 import { UserDetailsTable, UsersTable } from "@/drizzle/schema";
-import { MatchmakeSchema, MatchResultSchema } from "@/types/schemas/match";
+import { MatchmakeSchema, MatchResultSchema } from "@/lib/schemas/match";
 import {
 	and,
 	asc,
@@ -25,10 +25,10 @@ import {
 	inArray,
 	notInArray,
 } from "drizzle-orm";
-import { matchmake } from "@/server/admin/matchmake";
-import { updateRating } from "@/server/admin/score";
-import type { PlayerScore } from "@/types/player";
-import { getPersistedPairs, getPersistedPlayers } from "@/server/power-cards";
+import { matchmake } from "@/lib/server/admin/matchmake";
+import { updateRating } from "@/lib/server/admin/score";
+import type { PlayerScore } from "@/lib/types/player";
+import { getPersistedPairs, getPersistedPlayers } from "@/lib/server/power-cards";
 
 // TODO: Rollback transactions on error
 
