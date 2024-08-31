@@ -3,19 +3,19 @@ import Layout from "@/components/layouts/layout.astro";
 import UserChart from "@/components/user/admin/charts/user";
 import TopPlayers from "@/components/user/admin/top-players";
 import Matches from "@/components/user/admin/matches";
-import type { UserRoleCount } from "@/types/user";
-import type { PlayerLeaderboard } from "@/types/player";
-import type { MatchRowData } from "@/types/schemas/match";
+import type { UserRoleCount } from "@/lib/types/user";
+import type { PlayerLeaderboardResponseData } from "@/lib/types/player";
+import type { MatchResponseData } from "@/lib/types/match";
 import { db } from "@/drizzle/db";
 import { ArnisSeasonsTable, UsersTable } from "@/drizzle/schema";
 import { count, desc } from "drizzle-orm";
-import { getTopPlayers } from "@/server/players";
-import { getRecentMatches } from "@/server/admin/matches";
+import { getTopPlayers } from "@/lib/server/players";
+import { getRecentMatches } from "@/lib/server/admin/matches";
 
 type LoadData = {
   userRoles: UserRoleCount[];
-  topPlayers: PlayerLeaderboard[];
-  recentMatches: MatchRowData[];
+  topPlayers: PlayerLeaderboardResponseData[];
+  recentMatches: MatchResponseData[];
 };
 
 const data: LoadData = await db.transaction(async (tx) => {

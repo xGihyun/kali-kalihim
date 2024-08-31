@@ -1,7 +1,5 @@
 ---
-export const prerender = false;
-
-import MatchResultForm from "@/components/user/admin/match-result";
+import MatchResultForm from "./_components/match-result";
 import Layout from "@/components/layouts/layout.astro";
 import {
   MatchPlayersTable,
@@ -12,7 +10,7 @@ import {
 } from "@/drizzle/schema";
 import { db } from "@/drizzle/db";
 import { and, eq } from "drizzle-orm";
-import type { MatchPlayer } from "@/types/schemas/match";
+import type { MatchPlayer } from "@/lib/types/match";
 
 const { match_id } = Astro.params;
 

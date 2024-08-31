@@ -28,9 +28,9 @@ import { actions } from "astro:actions";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
-import { IconCalendar } from "@/assets/icons";
+import { IconCalendar } from "@/lib/icons";
 
-export default function Register(): JSX.Element {
+export default function Component(): JSX.Element {
   const form = useForm<RegisterInput>({
     resolver: zodResolver(RegisterSchema),
     defaultValues: {

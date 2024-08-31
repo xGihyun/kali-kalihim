@@ -29,7 +29,7 @@ type Props = {
 	sections: SectionModel[];
 };
 
-export default function NewSeason({ sections }: Props): JSX.Element {
+export default function Component({ sections }: Props): JSX.Element {
 	const form = useForm<PlayerSeasonInput>({
 		resolver: zodResolver(PlayerSeasonSchema),
 		defaultValues: {

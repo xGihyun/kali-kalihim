@@ -19,10 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { actions } from "astro:actions";
-import type {
-  ArnisSeasonModel,
-  ArnisTechniqueModel,
-} from "@/lib/types/arnis";
+import type { ArnisSeasonModel, ArnisTechniqueModel } from "@/lib/types/arnis";
 import type { SectionModel } from "@/lib/types/player";
 
 type Props = {
@@ -31,7 +28,7 @@ type Props = {
   arnisSeasons: ArnisSeasonModel[];
 };
 
-export default function Matchmake(props: Props): JSX.Element {
+export default function Component(props: Props): JSX.Element {
   const form = useForm<MatchmakeInput>({
     resolver: zodResolver(MatchmakeSchema),
     defaultValues: {
