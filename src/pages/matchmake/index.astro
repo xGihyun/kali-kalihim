@@ -7,17 +7,33 @@ import {
   ArnisTechniquesTable,
   SectionsTable,
 } from "@/drizzle/schema";
+import type { ArnisSeasonModel, ArnisTechniqueModel } from "@/lib/types/arnis";
+import type { SectionModel } from "@/lib/types/player";
 
-const arnisTechniques = await db.select().from(ArnisTechniquesTable);
-const sections = await db.select().from(SectionsTable);
-const arnisSeasons = await db.select().from(ArnisSeasonsTable);
+type LoadData = {
+  arnisTechniques: ArnisTechniqueModel[];
+  sections: SectionModel[];
+  arnisSeasons: ArnisSeasonModel[];
+};
+
+const data: LoadData = await db.transaction(async (tx) => {
+  const arnisTechniques = await tx.select().from(ArnisTechniquesTable);
+  const sections = await tx.select().from(SectionsTable);
+  const arnisSeasons = await tx.select().from(ArnisSeasonsTable);
+
+  return {
+    arnisSeasons,
+    sections,
+    arnisTechniques,
+  };
+});
 ---
 
 <Layout title="Matchmake">
   <MatchmakeForm
-    arnisTechniques={arnisTechniques}
-    sections={sections}
-    arnisSeasons={arnisSeasons}
+    arnisTechniques={data.arnisTechniques}
+    sections={data.sections}
+    arnisSeasons={data.arnisSeasons}
     client:load
   />
 </Layout>

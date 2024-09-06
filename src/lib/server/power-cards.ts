@@ -53,7 +53,7 @@ export async function ancientsDomain(
     .from(PlayerPowerCardsTable)
     .where(exists(query));
 
-  if (scoreDiff > 0 || !ancientsDomain) {
+  if (scoreDiff >= 0 || !ancientsDomain) {
     return false;
   }
 

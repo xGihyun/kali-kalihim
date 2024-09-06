@@ -26,7 +26,7 @@ import {
 	notInArray,
 } from "drizzle-orm";
 import { matchmake } from "@/lib/server/admin/matchmake";
-import { updateRating } from "@/lib/server/admin/score";
+import { updateRating } from "@/lib/server/scores";
 import type { PlayerScore } from "@/lib/types/player";
 import { getPersistedPairs, getPersistedPlayers } from "@/lib/server/power-cards";
 

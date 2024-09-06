@@ -24,7 +24,7 @@ export function matchmake(
 
 	for (const bucket of buckets.values()) {
 		if (unmatchedPlayer !== null) {
-			console.log("Push unmatched:", unmatchedPlayer);
+			//console.log("Push unmatched:", unmatchedPlayer);
 
 			bucket.push(unmatchedPlayer);
 			unmatchedPlayer = null;
@@ -45,11 +45,11 @@ export function matchmake(
 
 		if (unmatchedPlayer === null) {
 			unmatchedPlayer = bucket.pop()!;
-			console.log("Unmatched:", unmatchedPlayer);
+			//console.log("Unmatched:", unmatchedPlayer);
 			continue;
 		}
 
-		console.log("Matching unmatched:", unmatchedPlayer);
+		//console.log("Matching unmatched:", unmatchedPlayer);
 
 		const filteredBucket = bucket.filter(
 			(player) => player.userId !== unmatchedPlayer?.userId,

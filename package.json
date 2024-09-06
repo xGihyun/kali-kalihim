@@ -7,7 +7,8 @@
     "start": "astro dev",
     "build": "astro check && astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "test": "vitest"
   },
   "dependencies": {
     "@astrojs/check": "^0.8.3",
@@ -54,6 +55,7 @@
     "drizzle-kit": "^0.23.0",
     "prettier": "^3.3.3",
     "prettier-plugin-astro": "^0.14.1",
-    "unplugin-icons": "^0.19.1"
+    "unplugin-icons": "^0.19.1",
+    "vitest": "^2.0.5"
   }
 }
