@@ -29,8 +29,15 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { IconCalendar } from "@/lib/icons";
+import { useState } from "react";
+import { useStore } from "@nanostores/react";
+import { $signUpStore, $clerkStore } from "@clerk/astro/client";
+import Verify from "./verify";
 
 export default function Component(): JSX.Element {
+  const signUp = useStore($signUpStore);
+  const [verifying, setVerifying] = useState(false);
+
   const form = useForm<RegisterInput>({
     resolver: zodResolver(RegisterSchema),
     defaultValues: {
@@ -43,22 +50,54 @@ export default function Component(): JSX.Element {
     },
   });
 
-  async function onSubmit(values: RegisterInput) {
-    const toastId = toast.loading("Submitting...");
-    console.log("Values:", values);
-
-    const { error } = await actions.register(values);
-
-    if (error) {
-      console.error("ERROR:", error);
-      toast.error(error.message, {
-        id: toastId,
-        duration: Number.POSITIVE_INFINITY,
-      });
+  async function handleSignUp(data: RegisterInput): Promise<void> {
+    if (!signUp) {
       return;
     }
 
-    toast.success("Successfully registered.", { id: toastId });
+    try {
+      const completeSignUp = await signUp.create({
+        emailAddress: data.email,
+        password: data.password,
+      });
+
+      if (completeSignUp.status !== "complete") {
+        console.log(JSON.stringify(completeSignUp, null, 2));
+      }
+
+      await signUp.prepareEmailAddressVerification();
+    } catch (err) {
+      console.error("Error:", JSON.stringify(err, null, 2));
+    }
+  }
+
+  async function onSubmit(values: RegisterInput) {
+    const toastId = toast.loading("Submitting...");
+
+    console.log("Register values:", values);
+
+    await handleSignUp(values);
+
+    setVerifying(true);
+
+        // TODO: Insert values to database after successful verification
+
+    //const { error } = await actions.register(values);
+    //
+    //if (error) {
+    //  console.error("ERROR:", error);
+    //  toast.error(error.message, {
+    //    id: toastId,
+    //    duration: Number.POSITIVE_INFINITY,
+    //  });
+    //  return;
+    //}
+
+    toast.info("Please verify your account.", { id: toastId });
+  }
+
+  if (verifying) {
+    return <Verify />;
   }
 
   return (

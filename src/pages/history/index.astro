@@ -8,10 +8,10 @@ const matches = await db.select().from(MatchesTable);
 
 <Layout title="Matches">
   <div class="flex flex-col gap-2">
-  {
-    matches.map((match) => {
-      return <a href={`/history/${match.matchId}`}>{match.matchId}</a>;
-    })
-  }
+    {
+      matches.map((match) => {
+        return <a href={`/history/${match.matchId}`}>{match.matchId}</a>;
+      })
+    }
   </div>
 </Layout>

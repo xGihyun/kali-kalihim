@@ -12,7 +12,10 @@ import { and, desc, eq, exists, isNotNull, or, sql } from "drizzle-orm";
 
 // TODO: Remove the hard-coded power card IDs and find a better way
 
-export async function getPowerCards(tx = db, userId: string): Promise<PlayerPowerCard[]> {
+export async function getPowerCards(
+  tx = db,
+  userId: string,
+): Promise<PlayerPowerCard[]> {
   const powerCards = await tx
     .select({
       playerPowerCardId: PlayerPowerCardsTable.playerPowerCardId,
@@ -29,7 +32,7 @@ export async function getPowerCards(tx = db, userId: string): Promise<PlayerPowe
     )
     .where(eq(PlayerPowerCardsTable.userId, userId));
 
-  return powerCards
+  return powerCards;
 }
 
 export async function ancientsDomain(
@@ -208,7 +211,7 @@ export function getPersistedPairs(players: MatchPlayerModel[]): Player[][] {
 export async function twistOfFate(
   tx = db,
   currentPlayer: Player,
-  playersToSwap: PlayerSwap
+  playersToSwap: PlayerSwap,
 ): Promise<void> {
   const [isPersisted] = await tx
     .select({ userId: PlayerPowerCardsTable.userId })
@@ -227,12 +230,15 @@ export async function twistOfFate(
     .limit(1);
 
   if (isPersisted) {
-    console.log("Viral x Rival is active, swapping will be cancelled:", isPersisted);
+    console.log(
+      "Viral x Rival is active, swapping will be cancelled:",
+      isPersisted,
+    );
     return;
   }
 
   // TODO: Do I need this?
-  
+
   // NOTE:
   // Execute only if the record with the same `matchId` and `userId`
   // doesn't exist.
@@ -254,7 +260,7 @@ export async function twistOfFate(
 
   await swapPlayers(tx, playersToSwap);
 
-  console.log("Successfully swapped.")
+  console.log("Successfully swapped.");
 }
 
 async function swapPlayers(tx = db, player: PlayerSwap): Promise<void> {

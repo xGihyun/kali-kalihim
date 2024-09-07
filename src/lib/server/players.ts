@@ -11,7 +11,7 @@ export async function getTopPlayers(
   tx = db,
   arnisSeasonId: number,
   limit = 5,
-  offset = 0
+  offset = 0,
 ): Promise<PlayerLeaderboardResponseData[]> {
   const topPlayers = await tx
     .select({

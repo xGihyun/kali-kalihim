@@ -32,4 +32,3 @@ export const MatchResultSchema = z.object({
 export type MatchmakeInput = z.infer<typeof MatchmakeSchema>;
 export type MatchResultInput = z.infer<typeof MatchResultSchema>;
 export type MatchScoreInput = z.infer<typeof MatchScoreSchema>;
-

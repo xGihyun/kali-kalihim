@@ -1,11 +1,6 @@
 import type { PlayerLeaderboardResponseData } from "@/lib/types/player";
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import {
   Card,
   CardContent,
@@ -20,8 +15,8 @@ type Props = {
 
 export default function Component(props: Props): JSX.Element {
   return (
-    <Card >
-      <CardHeader >
+    <Card>
+      <CardHeader>
         <CardTitle>Top Players</CardTitle>
         <CardDescription>Top players for the current season</CardDescription>
       </CardHeader>

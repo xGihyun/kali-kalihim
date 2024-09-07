@@ -11,4 +11,4 @@ export type UserRoleCount = {
   count: number;
 };
 
-export type UserDetailsModel = InferSelectModel<typeof UserDetailsTable>
+export type UserDetailsModel = InferSelectModel<typeof UserDetailsTable>;

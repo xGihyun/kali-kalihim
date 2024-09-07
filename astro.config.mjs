@@ -4,39 +4,50 @@ import tailwind from "@astrojs/tailwind";
 import Icons from "unplugin-icons/vite";
 
 import vercel from "@astrojs/vercel/serverless";
+import clerk from "@clerk/astro";
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [react(), tailwind({
-    applyBaseStyles: false
-  })],
+  integrations: [
+    clerk(),
+    react(),
+    tailwind({
+      applyBaseStyles: false,
+    }),
+  ],
   experimental: {
     env: {
       schema: {
         DB_URL: envField.string({
           context: "server",
-          access: "secret"
-        })
-      }
-    }
+          access: "secret",
+        }),
+      },
+    },
   },
   output: "hybrid",
   vite: {
-    plugins: [Icons({
-      compiler: "jsx",
-      jsx: "react"
-    }), Icons({
-      compiler: "astro"
-    })],
+    plugins: [
+      Icons({
+        compiler: "jsx",
+        jsx: "react",
+      }),
+      Icons({
+        compiler: "astro",
+      }),
+    ],
     resolve: {
-      alias: [{
-        find: "icons:react",
-        replacement: "~icons"
-      }, {
-        find: "icons:astro",
-        replacement: "~icons"
-      }]
-    }
+      alias: [
+        {
+          find: "icons:react",
+          replacement: "~icons",
+        },
+        {
+          find: "icons:astro",
+          replacement: "~icons",
+        },
+      ],
+    },
   },
-  adapter: vercel()
+  adapter: vercel(),
 });

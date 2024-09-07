@@ -2,6 +2,7 @@
 /// <reference path="../.astro/env.d.ts" />
 /// <reference path="../.astro/actions.d.ts" />
 /// <reference types="astro/client" />
+/// <reference types="@clerk/astro/env" />
 
 declare module "icons:react/*" {
   import type { SVGProps } from "react";

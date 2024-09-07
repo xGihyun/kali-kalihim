@@ -68,7 +68,7 @@ export default function Component(props: Props): JSX.Element {
                     {match.arnisTechniques[0].name}
                   </TableCell>
                   <TableCell className="pr-6 text-lg text-right">
-                    {format(match.finishedAt, 'MMMM d, yyyy - hh:mm a')}
+                    {format(match.finishedAt, "MMMM d, yyyy - hh:mm a")}
                   </TableCell>
                 </TableRow>
               );

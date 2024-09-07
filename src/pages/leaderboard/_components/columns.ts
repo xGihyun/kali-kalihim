@@ -1,5 +1,5 @@
-import type { PlayerLeaderboardResponseData } from "@/lib/types/player"
-import type { ColumnDef } from "@tanstack/react-table"
+import type { PlayerLeaderboardResponseData } from "@/lib/types/player";
+import type { ColumnDef } from "@tanstack/react-table";
 
 export const columns: ColumnDef<PlayerLeaderboardResponseData>[] = [
   //{
@@ -17,12 +17,12 @@ export const columns: ColumnDef<PlayerLeaderboardResponseData>[] = [
   {
     accessorKey: "section.name",
     header: "Section",
-    cell: ({row}) => {
-      return `St. ${row.original.section.name}`
-    }
+    cell: ({ row }) => {
+      return `St. ${row.original.section.name}`;
+    },
   },
   {
     accessorKey: "rating",
     header: "Rating",
   },
-]
+];
