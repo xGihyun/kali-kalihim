@@ -1,4 +1,8 @@
-import { VerificationSchema, type VerificationInput } from "@/lib/schemas/auth";
+import {
+  VerificationSchema,
+  type RegisterInput,
+  type VerificationInput,
+} from "@/lib/schemas/auth";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -19,8 +23,13 @@ import {
 import { useStore } from "@nanostores/react";
 import { $signUpStore, $clerkStore } from "@clerk/astro/client";
 import { navigate } from "astro:transitions/client";
+import { actions } from "astro:actions";
 
-export default function Component(): JSX.Element {
+type Props = {
+  registerData: RegisterInput;
+};
+
+export default function Component(props: Props): JSX.Element {
   const signUp = useStore($signUpStore);
   const clerk = useStore($clerkStore);
 
@@ -63,7 +72,7 @@ export default function Component(): JSX.Element {
     console.log("Verification values:", values);
     await handleVerification({ code: values.code });
 
-    //const { error } = await actions.register(values);
+    //const { error } = await actions.register(props.registerData);
     //
     //if (error) {
     //  console.error("ERROR:", error);

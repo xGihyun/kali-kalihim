@@ -24,19 +24,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { actions } from "astro:actions";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { IconCalendar } from "@/lib/icons";
 import { useState } from "react";
 import { useStore } from "@nanostores/react";
-import { $signUpStore, $clerkStore } from "@clerk/astro/client";
+import { $signUpStore } from "@clerk/astro/client";
 import Verify from "./verify";
+import type { ClerkAPIError } from "@clerk/types";
+import { isClerkAPIResponseError } from "@clerk/clerk-react/errors";
 
 export default function Component(): JSX.Element {
   const signUp = useStore($signUpStore);
   const [verifying, setVerifying] = useState(false);
+  const [registerData, setRegisterData] = useState<RegisterInput>();
+  const [errors, setErrors] = useState<ClerkAPIError[]>([]);
 
   const form = useForm<RegisterInput>({
     resolver: zodResolver(RegisterSchema),
@@ -52,6 +55,7 @@ export default function Component(): JSX.Element {
 
   async function handleSignUp(data: RegisterInput): Promise<void> {
     if (!signUp) {
+      console.error("Sign up resource undefined.");
       return;
     }
 
@@ -67,37 +71,29 @@ export default function Component(): JSX.Element {
 
       await signUp.prepareEmailAddressVerification();
     } catch (err) {
+      if (isClerkAPIResponseError(err)) {
+        setErrors(err.errors);
+      }
+
       console.error("Error:", JSON.stringify(err, null, 2));
     }
   }
 
-  async function onSubmit(values: RegisterInput) {
+  async function onSubmit(values: RegisterInput): Promise<void> {
     const toastId = toast.loading("Submitting...");
 
     console.log("Register values:", values);
 
     await handleSignUp(values);
 
+    setRegisterData(values);
     setVerifying(true);
-
-        // TODO: Insert values to database after successful verification
-
-    //const { error } = await actions.register(values);
-    //
-    //if (error) {
-    //  console.error("ERROR:", error);
-    //  toast.error(error.message, {
-    //    id: toastId,
-    //    duration: Number.POSITIVE_INFINITY,
-    //  });
-    //  return;
-    //}
 
     toast.info("Please verify your account.", { id: toastId });
   }
 
-  if (verifying) {
-    return <Verify />;
+  if (verifying && registerData && errors.length === 0) {
+    return <Verify registerData={registerData} />;
   }
 
   return (
@@ -253,6 +249,10 @@ export default function Component(): JSX.Element {
             </FormItem>
           )}
         />
+
+        {errors.length > 0 && (
+          <p className="text-destructive">{errors[0].message}</p>
+        )}
 
         <Button type="submit">Submit</Button>
       </form>
