@@ -32,14 +32,17 @@ import { useState } from "react";
 import { useStore } from "@nanostores/react";
 import { $signUpStore } from "@clerk/astro/client";
 import Verify from "./verify";
-import type { ClerkAPIError } from "@clerk/types";
-import { isClerkAPIResponseError } from "@clerk/clerk-react/errors";
+import type { SignUpResource } from "@clerk/types";
+import { errAsync, fromPromise, okAsync, type ResultAsync } from "neverthrow";
+import { AppError } from "@/lib/types/error";
 
 export default function Component(): JSX.Element {
   const signUp = useStore($signUpStore);
   const [verifying, setVerifying] = useState(false);
   const [registerData, setRegisterData] = useState<RegisterInput>();
-  const [errors, setErrors] = useState<ClerkAPIError[]>([]);
+
+  // TODO: I might not need this anymore
+  const [error, setError] = useState<AppError | null>(null);
 
   const form = useForm<RegisterInput>({
     resolver: zodResolver(RegisterSchema),
@@ -53,46 +56,36 @@ export default function Component(): JSX.Element {
     },
   });
 
-  async function handleSignUp(data: RegisterInput): Promise<void> {
-    if (!signUp) {
-      console.error("Sign up resource undefined.");
-      return;
-    }
-
-    try {
-      const completeSignUp = await signUp.create({
-        emailAddress: data.email,
-        password: data.password,
-      });
-
-      if (completeSignUp.status !== "complete") {
-        console.log(JSON.stringify(completeSignUp, null, 2));
-      }
-
-      await signUp.prepareEmailAddressVerification();
-    } catch (err) {
-      if (isClerkAPIResponseError(err)) {
-        setErrors(err.errors);
-      }
-
-      console.error("Error:", JSON.stringify(err, null, 2));
-    }
-  }
-
   async function onSubmit(values: RegisterInput): Promise<void> {
+    setError(null);
     const toastId = toast.loading("Submitting...");
 
     console.log("Register values:", values);
 
-    await handleSignUp(values);
+    const result = handleSignUp(values, signUp).andThen((res) =>
+      prepareVerification(res),
+    );
 
-    setRegisterData(values);
-    setVerifying(true);
+    return result.match(
+      () => {
+        setRegisterData(values);
+        setVerifying(true);
 
-    toast.info("Please verify your account.", { id: toastId });
+        toast.info("Please verify your account.", { id: toastId });
+      },
+      (err) => {
+        setError(err);
+        console.error(JSON.stringify(err, null, 2));
+
+        toast.error(err.message, {
+          id: toastId,
+          duration: Number.POSITIVE_INFINITY,
+        });
+      },
+    );
   }
 
-  if (verifying && registerData && errors.length === 0) {
+  if (verifying && registerData && error === null) {
     return <Verify registerData={registerData} />;
   }
 
@@ -250,12 +243,40 @@ export default function Component(): JSX.Element {
           )}
         />
 
-        {errors.length > 0 && (
-          <p className="text-destructive">{errors[0].message}</p>
-        )}
-
         <Button type="submit">Submit</Button>
       </form>
     </Form>
   );
+}
+
+function handleSignUp(
+  data: RegisterInput,
+  signUp?: SignUpResource,
+): ResultAsync<SignUpResource, AppError> {
+  if (!signUp) {
+    return errAsync(new Error("Sign up resource is undefined."));
+  }
+
+  const createSignUp = signUp.create({
+    emailAddress: data.email,
+    password: data.password,
+  });
+
+  const result = fromPromise(createSignUp, (err) => {
+    return new AppError(err, `Unexpected sign up error: ${typeof err}`);
+  }).andThen((res) => okAsync(res));
+
+  return result;
+}
+
+function prepareVerification(
+  signUp: SignUpResource,
+): ResultAsync<null, AppError> {
+  const prepareVerification = signUp.prepareEmailAddressVerification();
+
+  const result = fromPromise(prepareVerification, (err) => {
+    return new AppError(err, `Unexpected verification error: ${typeof err}`);
+  }).andThen(() => okAsync(null));
+
+  return result;
 }

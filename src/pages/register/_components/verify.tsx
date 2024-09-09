@@ -24,6 +24,16 @@ import { useStore } from "@nanostores/react";
 import { $signUpStore, $clerkStore } from "@clerk/astro/client";
 import { navigate } from "astro:transitions/client";
 import { actions } from "astro:actions";
+import type { Clerk, SignUpResource } from "@clerk/types";
+import { AppError } from "@/lib/types/error";
+import {
+  errAsync,
+  fromPromise,
+  fromSafePromise,
+  okAsync,
+  ResultAsync,
+} from "neverthrow";
+import { isClerkAPIResponseError } from "@clerk/clerk-react/errors";
 
 type Props = {
   registerData: RegisterInput;
@@ -40,50 +50,29 @@ export default function Component(props: Props): JSX.Element {
     },
   });
 
-  async function handleVerification(data: VerificationInput) {
-    if (!signUp) {
-      return;
-    }
-
-    if (!clerk) {
-      return;
-    }
-
-    try {
-      const signInAttempt = await signUp.attemptEmailAddressVerification({
-        code: data.code,
-      });
-
-      if (signInAttempt.status === "complete") {
-        clerk.setActive({ session: signInAttempt.createdSessionId });
-
-        navigate("/");
-      } else {
-        console.error(signInAttempt);
-      }
-    } catch (err) {
-      console.error("Error:", JSON.stringify(err, null, 2));
-    }
-  }
-
-  async function onSubmit(values: VerificationInput) {
+  async function onSubmit(values: VerificationInput): Promise<void> {
     const toastId = toast.loading("Submitting...");
 
     console.log("Verification values:", values);
-    await handleVerification({ code: values.code });
 
-    //const { error } = await actions.register(props.registerData);
-    //
-    //if (error) {
-    //  console.error("ERROR:", error);
-    //  toast.error(error.message, {
-    //    id: toastId,
-    //    duration: Number.POSITIVE_INFINITY,
-    //  });
-    //  return;
-    //}
+    const result = handleVerification(values, clerk, signUp).andThen(() =>
+      handleRegister(props.registerData),
+    );
 
-    toast.success("Successfully registered.", { id: toastId });
+    return result.match(
+      () => {
+        toast.success("Successfully registered.", { id: toastId });
+        navigate("/");
+      },
+      (err) => {
+        console.error(JSON.stringify(err, null, 2));
+
+        toast.error(err.message, {
+          id: toastId,
+          duration: Number.POSITIVE_INFINITY,
+        });
+      },
+    );
   }
 
   return (
@@ -116,4 +105,44 @@ export default function Component(props: Props): JSX.Element {
       </form>
     </Form>
   );
+}
+
+function handleVerification(
+  data: VerificationInput,
+  clerk: Clerk | null,
+  signUp?: SignUpResource,
+): ResultAsync<null, AppError> {
+  if (!clerk) {
+    return errAsync(new Error("Clerk client is undefined."));
+  }
+
+  if (!signUp) {
+    return errAsync(new Error("Sign up resource is undefined."));
+  }
+
+  const attemptVerification = signUp.attemptEmailAddressVerification({
+    code: data.code,
+  });
+
+  const result = fromPromise(attemptVerification, (err) => {
+    if (isClerkAPIResponseError(err)) {
+      return err;
+    }
+
+    return new AppError(err, `Unexpected verification error: ${typeof err}`);
+  }).andThen(() => okAsync(null));
+
+  return result;
+}
+
+function handleRegister(data: RegisterInput): ResultAsync<null, AppError> {
+  const register = fromSafePromise(actions.register(data)).andThen((res) => {
+    if (res.error) {
+      return errAsync(new AppError(res.error));
+    }
+
+    return okAsync(null);
+  });
+
+  return register;
 }
