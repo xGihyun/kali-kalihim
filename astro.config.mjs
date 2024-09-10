@@ -25,7 +25,7 @@ export default defineConfig({
       },
     },
   },
-  output: "hybrid",
+  output: "server",
   vite: {
     plugins: [
       Icons({

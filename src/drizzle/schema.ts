@@ -63,7 +63,7 @@ export const UsersTable = pgTable("users", {
     .$onUpdate(() => new Date()),
   email: text("email").notNull().unique(),
 
-  // NOTE: I might not need this once auth is implemented
+  // TODO: Remove `password`
   password: text("password").notNull(),
   role: roleEnum("role").notNull().default("player"),
 });
@@ -159,8 +159,11 @@ export const PowerCardsTable = pgTable("power_cards", {
     .defaultNow()
     .$onUpdate(() => new Date()),
 
-  code: text("code").notNull().unique(),
   name: text("name").notNull(),
+  // Lower-cased `name`
+  // Can't be set as PK since it's dependent on the `name`.
+  // If the name changes, this has to be updated too. This can't be done on PKs
+  identifier: text("identifier").notNull().unique(),
   description: text("description").notNull(),
   imageUrl: text("image_url"),
 });

@@ -17,7 +17,14 @@ import type {
 
 // TODO: Remove this once proper auth is implemented
 //const currentUser = "b00d9f00-0b8a-478d-8240-fa7090d06fb4";
-const currentUser = "477bb83d-4752-4afa-acb2-1f9a9e0172f4";
+const { userId } = Astro.locals.auth();
+
+console.log(Astro.locals.auth())
+
+if (!userId) {
+  console.error("User not found.");
+  return Astro.redirect("/register")
+}
 
 type LoadData = {
   powerCards: PlayerPowerCard[];
@@ -32,15 +39,15 @@ const data: LoadData = await db.transaction(async (tx) => {
     .orderBy(desc(ArnisSeasonsTable.createdAt))
     .limit(1);
 
-  const powerCards = await getPowerCards(tx, currentUser);
+  const powerCards = await getPowerCards(tx, userId);
   const upcomingMatch = await getUpcomingMatch(
     tx,
-    currentUser,
+    userId,
     latestSeason.arnisSeasonId,
   );
   const previousMatches = await getPreviousMatches(
     tx,
-    currentUser,
+    userId,
     latestSeason.arnisSeasonId,
   );
 

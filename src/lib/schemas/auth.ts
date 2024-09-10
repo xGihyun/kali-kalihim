@@ -34,6 +34,7 @@ export const LoginSchema = z.object({
 export const VerificationSchema = z.object({ code: z.string().min(6) });
 
 export type RegisterInput = z.infer<typeof RegisterSchema>;
+export type LoginInput = z.infer<typeof LoginSchema>;
 export type PlayerSeasonInput = z.infer<typeof PlayerSeasonSchema>;
 export type FullNameInput = z.infer<typeof FullNameSchema>;
 export type VerificationInput = z.infer<typeof VerificationSchema>;
