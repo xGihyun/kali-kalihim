@@ -1,4 +1,11 @@
-import type { Matchmake, PowerCard, UpdatePowerCard, LatestOpponent, Result } from '$lib/types';
+import type {
+	Matchmake,
+	PowerCard,
+	UpdatePowerCard,
+	LatestOpponent,
+	Result,
+	Badge
+} from '$lib/types';
 import { redirect, type Actions, fail } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { BACKEND_URL } from '$env/static/private';
@@ -130,11 +137,23 @@ export const load: PageServerLoad = async ({ fetch, locals, setHeaders, depends 
 		return latestOpponent;
 	};
 
+	// TODO: Handle errors better
+	const getBadges = async (): Promise<Badge[]> => {
+		if (!user_id) return [];
+
+		const response = await fetch(`${BACKEND_URL}/users/${user_id}/badges`, { method: 'GET' });
+
+		const badges = await response.json();
+
+		return badges;
+	};
+
 	const data = Promise.all([
 		getPowerCards(),
 		getLatestMatches(),
 		getLatestOpponentDetails(),
-		getOriginalMatches()
+		getOriginalMatches(),
+		getBadges()
 	]);
 
 	setHeaders({ 'cache-control': `max-age=10, must-revalidate` });

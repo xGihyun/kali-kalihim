@@ -20,6 +20,9 @@ export const load: PageServerLoad = async ({ fetch, params, setHeaders }) => {
 
 	const result: CardBattleTurn[] = await response.json();
 
+	console.log('RESULT');
+	console.log(result);
+
 	if (result.length <= 0) {
 		return {
 			turns: {

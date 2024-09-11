@@ -75,7 +75,7 @@
 >
 	<Dialog.Content class="max-w-6xl z-[250] overflow-y-auto max-h-[90svh]">
 		<Dialog.Header>
-			<Dialog.Title class="text-2xl">Arnis</Dialog.Title>
+			<Dialog.Title class="text-2xl font-jost-semibold">Arnis</Dialog.Title>
 		</Dialog.Header>
 
 		{#if $page.state.selected}
@@ -149,7 +149,6 @@
 							<Table.Row class="text-sm sm:text-base md:text-lg">
 								<Table.Head>Opponent</Table.Head>
 								<Table.Head>Skill</Table.Head>
-								<Table.Head>Footwork</Table.Head>
 							</Table.Row>
 						</Table.Header>
 						<Table.Body>
@@ -172,9 +171,6 @@
 											}`}>{getOpponent(userId, match).name}</Table.Cell
 										>
 										<Table.Cell class="w-1/4">{snakeCaseToTitleCase(match.arnis_skill)}</Table.Cell>
-										<Table.Cell class="w-1/4"
-											>{snakeCaseToTitleCase(match.arnis_footwork)}</Table.Cell
-										>
 									</Table.Row>
 								</a>
 							{/each}

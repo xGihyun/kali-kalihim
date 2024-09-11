@@ -4,6 +4,7 @@
 	import { onMount } from 'svelte';
 	import '../app.postcss';
 	import { invalidateAll } from '$app/navigation';
+	import { Toaster } from '$lib/components/ui/sonner';
 
 	export let data;
 
@@ -24,6 +25,8 @@
 		return () => subscription.unsubscribe();
 	});
 </script>
+
+<Toaster closeButton richColors theme="dark" />
 
 {#if data.user && !$page.route.id?.startsWith('/(auth)')}
 	<Sidebar user={data.user} />

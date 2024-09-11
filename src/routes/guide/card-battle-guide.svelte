@@ -10,10 +10,9 @@
 
 <p class="text-base md:text-lg">
 	The Card Battle is a virtual simulation of an Arnis match that makes use of the fundamental
-	skills. <br />
-	Players can pick <span class="font-jost-medium text-primary">six (6) cards</span> (duplicates
-	allowed) within <span class="font-jost-medium text-primary">six (6) hours</span> after the admin
-	has queued a new match. <br /><br />
+	skills. Players can pick <span class="font-jost-medium text-primary">six (6) cards</span>
+	(duplicates allowed) within <span class="font-jost-medium text-primary">six (6) hours</span> after
+	the admin has queued a new match. <br /><br />
 	Once the cards have been submitted, the admin will run a simulation to see who wins. The winner will
 	get additional points on their score. <br /><br />
 	The details on what each card does can be found in the

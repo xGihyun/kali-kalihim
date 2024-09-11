@@ -7,6 +7,7 @@ import PowerCards from './PowerCards.svelte';
 import MatchHistory from './MatchHistory.svelte';
 import Banner from './Banner.svelte';
 import RankLogo from './RankLogo.svelte';
+import Badges from './badges.svelte';
 
 export {
 	Navbar,
@@ -17,5 +18,6 @@ export {
 	PowerCards,
 	MatchHistory,
 	Banner,
-	RankLogo
+	RankLogo,
+	Badges
 };

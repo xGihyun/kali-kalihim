@@ -47,8 +47,8 @@ export const EmailSchema = z.object({
 
 export const arnisMatchSchema = z.object({
 	section: z.string().min(1),
-	skill: z.string().min(1),
-	footwork: z.string().min(1)
+	skill: z.string().min(1)
+	// footwork: z.string().min(1)
 });
 
 export type ArnisMatchSchema = typeof arnisMatchSchema;
@@ -63,9 +63,10 @@ export const UpdateScoreSchema = z.object({
 export const SubmitScoreSchema = z.object({
 	user1_id: z.string(),
 	user2_id: z.string(),
-	user1_score: z.coerce.number(),
-	user2_score: z.coerce.number(),
-	match_set_id: z.string()
+	user1_score: z.coerce.number().max(40).min(0),
+	user2_score: z.coerce.number().max(40).min(0),
+	match_set_id: z.string(),
+	comment: z.string()
 });
 
 export const UpdateUserSchema = z.object({
@@ -92,4 +93,10 @@ export const DeleteUsersSchema = z.object({
 
 export const ResetPasswordSchema = z.object({
 	email: z.string().email()
+});
+
+export const rubricSchema = z.object({
+	title: z.string(),
+	description: z.string().optional(),
+	max_score: z.coerce.number()
 });

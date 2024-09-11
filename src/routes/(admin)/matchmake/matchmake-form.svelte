@@ -81,21 +81,21 @@
 				</Form.Item>
 			</Form.Field>
 
-			<Form.Field {config} name="footwork">
-				<Form.Item class="space-y-0 flex-1">
-					<Form.Select>
-						<Form.SelectTrigger placeholder="Footwork" class="text-base md:text-lg h-auto" />
-						<Form.SelectContent>
-							{#each FOOTWORKS as [key, value] (key)}
-								<Form.SelectItem value={key} class="text-base md:text-lg h-auto"
-									>{value}</Form.SelectItem
-								>
-							{/each}
-						</Form.SelectContent>
-					</Form.Select>
-					<Form.Validation />
-				</Form.Item>
-			</Form.Field>
+			<!-- <Form.Field {config} name="footwork"> -->
+			<!-- 	<Form.Item class="space-y-0 flex-1"> -->
+			<!-- 		<Form.Select> -->
+			<!-- 			<Form.SelectTrigger placeholder="Footwork" class="text-base md:text-lg h-auto" /> -->
+			<!-- 			<Form.SelectContent> -->
+			<!-- 				{#each FOOTWORKS as [key, value] (key)} -->
+			<!-- 					<Form.SelectItem value={key} class="text-base md:text-lg h-auto" -->
+			<!-- 						>{value}</Form.SelectItem -->
+			<!-- 					> -->
+			<!-- 				{/each} -->
+			<!-- 			</Form.SelectContent> -->
+			<!-- 		</Form.Select> -->
+			<!-- 		<Form.Validation /> -->
+			<!-- 	</Form.Item> -->
+			<!-- </Form.Field> -->
 		</div>
 
 		<Form.Button

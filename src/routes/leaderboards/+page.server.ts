@@ -15,6 +15,7 @@ export const load: PageServerLoad = async ({ setHeaders, url, locals }) => {
 			.from('users')
 			.select('first_name, last_name, id, score, section, sex, rank_overall, rank_section')
 			.order('score', { ascending: false })
+			.eq('role', 'user')
 			.range(skip, skip + limit - 1);
 
 		const { data, error: err } = sections
@@ -85,21 +86,6 @@ export const actions: Actions = {
 			});
 		}
 
-		form.data.users.forEach(async (id) => {
-			const { error } = await event.locals.supabaseAdmin.auth.admin.deleteUser(id);
-
-			console.log('Deleting auth data...');
-			console.log(error);
-
-			if (error) {
-				return fail(error.status || 500, {
-					form,
-					success: false,
-					message: 'Failed to delete user auth account.'
-				});
-			}
-		});
-
 		const response = await event.fetch(`${BACKEND_URL}/users?force=${form.data.force}`, {
 			method: 'DELETE',
 			body: JSON.stringify(form.data.users),
@@ -120,6 +106,21 @@ export const actions: Actions = {
 				message: 'Failed to delete user in the database.'
 			});
 		}
+
+		form.data.users.forEach(async (id) => {
+			const { error } = await event.locals.supabaseAdmin.auth.admin.deleteUser(id);
+
+			console.log('Deleting auth data...');
+			console.log(error);
+
+			if (error) {
+				return fail(error.status || 500, {
+					form,
+					success: false,
+					message: 'Failed to delete user auth account.'
+				});
+			}
+		});
 
 		return {
 			form,

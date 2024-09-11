@@ -1,5 +1,23 @@
-import { ArrowClockwise, Guide, History, Home, Sword, Trophy } from './assets/icons';
-import type { BlockData, Matchmake, Navigation, StrikeData, Video } from './types';
+import {
+	ArrowClockwise,
+	Guide,
+	HandsHoldingCircle,
+	History,
+	Home,
+	PeopleGroup,
+	Sword,
+	Trophy
+} from './assets/icons';
+import type {
+	Badge,
+	BadgeIcon,
+	BadgeInfo,
+	BlockData,
+	Matchmake,
+	Navigation,
+	StrikeData,
+	Video
+} from './types';
 import {
 	ancients_protection,
 	double_edged_sword,
@@ -8,7 +26,16 @@ import {
 	viral_x_rival,
 	warlords_domain
 } from './assets/images/cards';
-import { Diamond, Forward, Swords, UsersRound } from 'lucide-svelte';
+import {
+	ArrowBigRightDash,
+	BlocksIcon,
+	Crown,
+	Diamond,
+	Forward,
+	ShieldPlus,
+	Swords,
+	UsersRound
+} from 'lucide-svelte';
 import { CardStack } from 'radix-icons-svelte';
 import {
 	Blocks,
@@ -17,6 +44,34 @@ import {
 	SidewardSinawali,
 	Strikes
 } from './assets/images/thumbnails';
+
+export const BADGES: BadgeIcon[] = [
+	{
+		name: 'Invincible Under the Sun',
+		description: 'Top 1 Player',
+		icon: Crown
+	},
+	{
+		name: 'Uncrowned Kings/Queens',
+		description: 'Top 2-10 Players',
+		icon: PeopleGroup
+	},
+	{
+		name: 'Defense Juggernaut',
+		description: 'Best in Blocks',
+		icon: ShieldPlus
+	},
+	{
+		name: 'Offensive Prodigy',
+		description: 'Best in Strikes',
+		icon: Swords
+	},
+	{
+		name: 'Weaving Master',
+		description: 'Best in Sinawali',
+		icon: ArrowBigRightDash
+	}
+];
 
 export const ARNIS_STRIKES_VIDEOS: Video[] = [
 	{
@@ -70,11 +125,11 @@ export const ARNIS_FOOTWORKS_VIDEOS: Video[] = [
 ];
 
 export const RANK_LOGO_COLORS: Map<string, string> = new Map([
-	['likas', 'border-white bg-gradient-to-l from-red-900 to-red-600'],
-	['likha', 'border-white bg-gradient-to-l from-orange-900 to-orange-500'],
-	['lakan', 'border-black bg-gradient-to-l from-amber-900 to-amber-500'],
-	['grandmaster', 'border-red-800 bg-gradient-to-l from-red-900 to-red-600'],
-	['unranked', 'border-border bg-background']
+	['likas', 'border-yellow-700 bg-gradient-to-l from-yellow-900 to-yellow-600'],
+	['likha', 'border-blue-500 bg-gradient-to-l from-blue-900 to-blue-500'],
+	['lakan', 'border-amber-500 bg-gradient-to-l from-amber-900 to-amber-500'],
+	['grandmaster', 'border-black bg-gradient-to-l from-red-900 to-red-600'],
+	['unranked', 'border-white bg-gradient-to-l from-neutral-500 to-neutral-50']
 ]);
 
 export const CACHE_DURATION = 60 * 10;
@@ -94,6 +149,11 @@ export const ADMIN_ROUTES: Navigation = [
 		name: 'Sections',
 		path: '/sections',
 		icon: UsersRound
+	},
+	{
+		name: 'Rubrics',
+		path: '/rubrics',
+		icon: BlocksIcon
 	}
 	// {
 	// 	name: 'Users',
@@ -174,9 +234,8 @@ export const POWER_CARDS = new Map([
 export const SKILLS = new Map([
 	['strikes', 'Strikes'],
 	['blocks', 'Blocks'],
-	['forward_sinawali', 'Forward Sinawali'],
-	['sideward_sinawali', 'Sideward Sinawali'],
-	['reversed_sinawali', 'Reversed Sinawali']
+	['sinawali', 'Sinawali'],
+	['footwork', 'Footwork']
 ]);
 
 export const FOOTWORKS = new Map([

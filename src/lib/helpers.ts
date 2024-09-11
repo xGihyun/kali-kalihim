@@ -1,6 +1,9 @@
-import { invalidate } from '$app/navigation';
+import { invalidate, invalidateAll } from '$app/navigation';
 import { crop } from '$lib/pkg/my_package';
-import type { Dimensions, Result } from './types';
+import type { ActionResult, NumericRange } from '@sveltejs/kit';
+import type { Dimensions, HttpResult, RequestType, Result } from './types';
+import z, { ZodSchema, type AnyZodObject, undefined, unknown } from 'zod';
+import { toast } from 'svelte-sonner';
 
 export async function upload(
 	photo: File | null,
@@ -55,4 +58,54 @@ export async function upload(
 
 export function isResult(obj: any): obj is Result {
 	return obj && typeof obj === 'object' && 'success' in obj;
+}
+
+export function toResult<T>(data?: HttpResult<T>, dataSchema?: ZodSchema<T>): HttpResult<T> {
+	const schema = z.object({
+		success: z.boolean(),
+		code: z.number(),
+		message: z.string(),
+		data: dataSchema ? dataSchema.optional() : undefined()
+	});
+
+	const result = schema.parse(data);
+
+	return result;
+}
+
+export function toErrorCode(num: number): NumericRange<400, 599> {
+	if (num >= 400 && num <= 599) {
+		return num as NumericRange<400, 599>;
+	}
+
+	return 500;
+}
+
+export async function processActionResult(
+	result: ActionResult<Record<string, any>, Record<string, unknown>>
+): Promise<void> {
+	switch (result.type) {
+		case 'success':
+		case 'failure':
+			{
+				const requestResult = toResult(result.data?.result);
+
+				if (result.type === 'success') {
+					toast.success(requestResult.message);
+
+					return;
+				}
+
+				toast.error(requestResult.message);
+			}
+
+			break;
+		case 'error':
+			toast.error(result.error.message);
+
+			break;
+		default:
+			toast.error('Unknown request type.');
+			break;
+	}
 }

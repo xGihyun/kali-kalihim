@@ -57,7 +57,7 @@
 
 	onMount(() => {
 		timerInterval = setInterval(() => {
-			if (isResult(matches)) return;
+			if (isResult(matches) || matches.length < 1) return;
 
 			const currentTime = new Date().getTime();
 			const deadline = new Date(matches[0].card_deadline).getTime();

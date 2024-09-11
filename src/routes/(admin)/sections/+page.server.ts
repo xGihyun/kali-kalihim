@@ -6,11 +6,9 @@ export const load: PageServerLoad = async ({ fetch, setHeaders, depends }) => {
 	const response = await fetch(`${BACKEND_URL}/sections/count`, { method: 'GET' });
 	const sections: Section[] = await response.json();
 
-	console.log(sections);
-
 	depends('sections:table');
 
-	setHeaders({ 'cache-control': `max-age=10, must-revalidate` });
+	setHeaders({ 'cache-control': `max-age=5, must-revalidate` });
 
 	return {
 		sections

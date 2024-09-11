@@ -1,5 +1,5 @@
 import type { ComponentType, SvelteComponent } from 'svelte';
-import type { RegisterSchema, arnisMatchSchema } from './schemas';
+import type { RegisterSchema, arnisMatchSchema, rubricSchema } from './schemas';
 import z from 'zod';
 
 export type User = {
@@ -69,6 +69,7 @@ export type Matchmake = {
 	user2_des_count: number;
 	user1_ap_count: number;
 	user2_ap_count: number;
+	comment: string;
 };
 
 export type LatestOpponent = {
@@ -178,8 +179,53 @@ export type Video = {
 };
 
 export type ArnisMatch = z.infer<typeof arnisMatchSchema>;
+export type RubricSchema = typeof rubricSchema;
 
 export type Dimensions = {
 	width: number;
 	height: number;
+};
+
+export type Rubric = {
+	id: number;
+	title: string;
+	description?: string;
+	max_score: number;
+};
+
+export type HttpResult<T> = {
+	success: boolean;
+	code: number;
+	message: string;
+	data?: T;
+};
+
+export type ActionData<T> = {
+	message: string;
+	data?: T;
+};
+
+export type RequestType = 'success' | 'failure' | 'pending' | 'none' | 'unknown';
+
+export type RequestStatus2 = {
+	type: RequestType;
+	message: string;
+};
+
+export type Badge = {
+	id: string;
+	name: string;
+	description: string;
+	user_id: string;
+};
+
+export type BadgeInfo = {
+	name: string;
+	description: string;
+};
+
+export type BadgeIcon = {
+	name: string;
+	description?: string;
+	icon?: ComponentType<SvelteComponent>;
 };

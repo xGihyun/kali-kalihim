@@ -32,7 +32,7 @@
 
 		if (response.ok) {
 			console.log('Success card battle');
-			invalidate('card-battle:damage');
+			await invalidate('card-battle:damage');
 			requestStatus.type = 'success';
 		} else {
 			console.error('Failed to run card battle.');
@@ -48,8 +48,8 @@
 		<div class="flex gap-2 w-full">
 			{#await data.lazy.data}
 				<Skeleton class="min-h-10 w-80" />
-			{:then lazyData}
-				{#if lazyData[2]}
+			{:then [matches, ogMatches, sections, maxSets, rubrics]}
+				{#if sections}
 					<Select.Root
 						selected={{
 							value: selectedSection,
@@ -60,7 +60,7 @@
 							<Select.Value placeholder="Section" class="text-base md:text-lg" />
 						</Select.Trigger>
 						<Select.Content>
-							{#each lazyData[2] as section (section.id)}
+							{#each sections as section (section.id)}
 								<a
 									class="contents"
 									href={`/match-history?set=${selectedSet}&section=${section.id}&match_type=${selectedMatchType}`}
@@ -85,14 +85,14 @@
 
 			{#await data.lazy.data}
 				<Skeleton class="min-h-10 w-60" />
-			{:then lazyData}
-				{#if lazyData[3]}
+			{:then [matches, ogMatches, sections, maxSets, rubrics]}
+				{#if maxSets}
 					<Select.Root selected={{ value: selectedSet, label: `Match ${selectedSet}` }}>
 						<Select.Trigger class="flex-1 h-auto">
 							<Select.Value placeholder="Match Set" class="text-base md:text-lg" />
 						</Select.Trigger>
 						<Select.Content>
-							{#each lazyData[3] as maxSet (maxSet.section)}
+							{#each maxSets as maxSet (maxSet.section)}
 								{#if maxSet.section === selectedSection}
 									{#each Array(maxSet.max_set) as _, idx (idx)}
 										<a
@@ -183,12 +183,12 @@
 				<Skeleton class="h-8 col-span-1" />
 			{/each}
 		</div>
-	{:then lazyData}
-		{#if lazyData[0] && lazyData[1]}
+	{:then [matches, ogMatches, sections, maxSets, rubrics]}
+		{#if matches && ogMatches}
 			{#if selectedMatchType === 'arnis'}
-				<ArnisTable form={data.form} matches={lazyData[0]} />
+				<ArnisTable form={data.form} {matches} {rubrics} />
 			{:else if selectedMatchType === 'card_battle'}
-				<CardBattleTable matches={lazyData[1]} />
+				<CardBattleTable matches={ogMatches} />
 			{:else}
 				<Alert.Root variant="destructive">
 					<AlertCircle class="h-4 w-4" />

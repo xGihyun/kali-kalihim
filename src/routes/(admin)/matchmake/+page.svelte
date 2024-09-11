@@ -22,8 +22,8 @@
 					<Table.Head>VS</Table.Head>
 					<Table.Head>Player 2</Table.Head>
 					<Table.Head>Skill</Table.Head>
-					<Table.Head>Footwork</Table.Head>
-					<Table.Head>Status</Table.Head>
+					<!-- <Table.Head>Footwork</Table.Head> -->
+					<!-- <Table.Head>Status</Table.Head> -->
 				</Table.Row>
 			</Table.Header>
 			<Table.Body>
@@ -42,12 +42,12 @@
 						<Table.Cell>
 							{SKILLS.get(match.arnis_skill)}
 						</Table.Cell>
-						<Table.Cell>
-							{FOOTWORKS.get(match.arnis_footwork)}
-						</Table.Cell>
-						<Table.Cell>
-							{match.status}
-						</Table.Cell>
+						<!-- <Table.Cell> -->
+						<!-- 	{FOOTWORKS.get(match.arnis_footwork)} -->
+						<!-- </Table.Cell> -->
+						<!-- <Table.Cell> -->
+						<!-- 	{match.status} -->
+						<!-- </Table.Cell> -->
 					</Table.Row>
 				{/each}
 			</Table.Body>

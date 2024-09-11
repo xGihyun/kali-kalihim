@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getOpponent } from '$lib';
+	import { Separator } from '$lib/components/ui/separator';
 	import * as Table from '$lib/components/ui/table';
 
 	export let data;
@@ -193,4 +194,12 @@
 			</Table.Row>
 		</Table.Body>
 	</Table.Root>
+
+	<Separator />
+
+	<div>
+		<h4 class="text-xl font-jost-medium mb-4">Comment</h4>
+
+		<p>{match.comment}</p>
+	</div>
 {/if}

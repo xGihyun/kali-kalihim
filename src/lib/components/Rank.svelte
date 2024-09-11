@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getRankTitle } from '$lib';
-	import type { Result, User } from '$lib/types';
+	import type { Badge, Result, User } from '$lib/types';
 	import * as Card from '$lib/components/ui/card';
 	import { RankLogo } from '.';
 	import * as Alert from '$lib/components/ui/alert';
@@ -30,7 +30,7 @@
 					class="absolute left-0 top-0 w-full h-full transform-gpu animate-gradient-x bg-gradient-to-r from-blue-950 to-rose-950 bg-[size:200%] z-10"
 				/>
 
-				<div class="absolute right-0 top-0 w-1/2 h-full bg-gradient-to-l from-card z-[60]"></div>
+				<!-- <div class="absolute right-0 top-0 w-1/2 h-full bg-gradient-to-l from-card z-[60]"></div> -->
 				<RankLogo
 					title={getRankTitle(user.score)}
 					width="lg:h-20 h-16"

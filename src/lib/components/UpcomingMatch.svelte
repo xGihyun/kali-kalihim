@@ -106,15 +106,6 @@
 						>
 					</Card.Content>
 				</Card.Root>
-
-				<Card.Root class="px-3 py-2 bg-background flex items-center border-border/75">
-					<Card.Content class="p-0">
-						<h4 class="text-muted-foreground text-sm md:text-base">Footwork</h4>
-						<span class="text-base sm:text-xl md:text-2xl font-jost-medium"
-							>{snakeCaseToTitleCase(matches[0].arnis_footwork)}</span
-						>
-					</Card.Content>
-				</Card.Root>
 			</div>
 		</Card.Content>
 	{:else}

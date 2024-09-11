@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as Table from '$lib/components/ui/table';
 	import * as Dialog from '$lib/components/ui/dialog';
-	import type { Matchmake } from '$lib/types';
+	import type { Matchmake, Rubric } from '$lib/types';
 	import ScoresForm from './scores-form.svelte';
 	import type { SuperValidated } from 'sveltekit-superforms';
 	import type { SubmitScoreSchema } from '$lib/schemas';
@@ -9,6 +9,7 @@
 	import { snakeCaseToTitleCase } from '$lib';
 
 	export let form: SuperValidated<typeof SubmitScoreSchema>;
+	export let rubrics: Rubric[];
 	export let matches: Matchmake[];
 
 	let clickedRow: string | null = null;
@@ -25,7 +26,7 @@
 			<Table.Head class="font-jost-medium">VS</Table.Head>
 			<Table.Head>Player 2</Table.Head>
 			<Table.Head>Skill</Table.Head>
-			<Table.Head>Footwork</Table.Head>
+			<!-- <Table.Head>Footwork</Table.Head> -->
 			<Table.Head>Status</Table.Head>
 		</Table.Row>
 	</Table.Header>
@@ -48,9 +49,9 @@
 				<Table.Cell>
 					{snakeCaseToTitleCase(match.arnis_skill)}
 				</Table.Cell>
-				<Table.Cell>
-					{snakeCaseToTitleCase(match.arnis_footwork)}
-				</Table.Cell>
+				<!-- <Table.Cell> -->
+				<!-- 	{snakeCaseToTitleCase(match.arnis_footwork)} -->
+				<!-- </Table.Cell> -->
 				<Table.Cell class="flex items-center gap-2">
 					{#if match.status === 'done'}
 						<CheckCircled class="w-5 h-5 text-green-500" />
@@ -62,7 +63,7 @@
 			</Table.Row>
 
 			<Dialog.Root open={clickedRow === match.id} closeOnOutsideClick={false}>
-				<Dialog.Content>
+				<Dialog.Content class="max-h-[90svh] overflow-auto">
 					<Dialog.Header>
 						<Dialog.Title>Score Submission</Dialog.Title>
 						<Dialog.Description>Enter your scores for each player.</Dialog.Description>
@@ -75,6 +76,7 @@
 						user1_name={user1}
 						user2_name={user2}
 						match_set_id={match.id}
+						{rubrics}
 					/>
 				</Dialog.Content>
 			</Dialog.Root>

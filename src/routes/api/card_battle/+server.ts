@@ -14,7 +14,9 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
 	});
 
 	if (response.ok) {
-		console.log('Success card battle');
+		console.log('Card Battle Successful.');
+	} else {
+		console.error('Card Battle failed: ' + (await response.text()));
 	}
 
 	return new Response();

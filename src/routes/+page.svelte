@@ -1,5 +1,6 @@
 <script lang="ts">
 	import {
+		Badges,
 		Banner,
 		MatchHistory,
 		PowerCards,
@@ -25,10 +26,11 @@
 			<Skeleton class="min-h-20" />
 			<Skeleton class="min-h-20" />
 			<Skeleton class="min-h-20" />
-		{:then [powerCards, matches, opponentDetails, ogMatches]}
+		{:then [powerCards, matches, opponentDetails, ogMatches, badges]}
 			<UpcomingMatch {matches} userId={user.id} {opponentDetails} />
 			<PowerCards {powerCards} isCurrentUser={true} {user} {matches} />
 			<MatchHistory {matches} userId={user.id} {ogMatches} />
+			<Badges {badges} currentUser={user} {user} />
 		{/await}
 	</div>
 {:else}

@@ -1,4 +1,4 @@
-import type { Matchmake, MaxSet, Section, UpdateScore } from '$lib/types';
+import type { Matchmake, MaxSet, Rubric, Section, UpdateScore } from '$lib/types';
 import { fail, type Actions, error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { SubmitScoreSchema } from '$lib/schemas';
@@ -63,12 +63,22 @@ export const load: PageServerLoad = async ({ fetch, url, depends, setHeaders, lo
 		return null;
 	};
 
-	const data = Promise.all([getMatches(), getOriginalMatches(), getSections(), getMaxSets()]);
+	const getRubrics = async () => {
+		const response = await fetch(`${BACKEND_URL}/rubrics`, { method: 'GET' });
+		const rubrics: Rubric[] = await response.json();
+
+		return rubrics;
+	};
+
+	const data = Promise.all([
+		getMatches(),
+		getOriginalMatches(),
+		getSections(),
+		getMaxSets(),
+		getRubrics()
+	]);
 
 	depends('card-battle:damage');
-
-	// TODO: CACHE INVALIDATION
-	setHeaders({ 'cache-control': `max-age=30, must-revalidate` });
 
 	return {
 		lazy: {
@@ -85,6 +95,8 @@ export const load: PageServerLoad = async ({ fetch, url, depends, setHeaders, lo
 export const actions: Actions = {
 	submit_score: async (event) => {
 		const form = await superValidate(event, SubmitScoreSchema);
+
+		console.log(form.data);
 
 		if (!form.valid) {
 			return fail(400, {
@@ -144,6 +156,16 @@ export const actions: Actions = {
 				form,
 				success: false,
 				message: updateMatch.message
+			});
+		}
+
+		const comment = await insertComment(event.fetch, match_set_id, form.data.comment);
+
+		if (!comment.success) {
+			return fail(comment.code, {
+				form,
+				success: false,
+				message: comment.message
 			});
 		}
 
@@ -230,6 +252,36 @@ async function updateMatchStatus(
 	return {
 		success: true,
 		message: `Successfully updated match status to: ${status}`,
+		code: response.status
+	};
+}
+
+async function insertComment(
+	fetch: (input: URL | RequestInfo, init?: RequestInit | undefined) => Promise<Response>,
+	match_set_id: string,
+	comment: string
+) {
+	const response = await fetch(`${BACKEND_URL}/matches/${match_set_id}/comment`, {
+		method: 'PATCH',
+		body: JSON.stringify({
+			comment
+		}),
+		headers: {
+			'Content-Type': 'application/json'
+		}
+	});
+
+	if (!response.ok) {
+		return {
+			success: false,
+			code: response.status,
+			message: 'Failed to update match status.'
+		};
+	}
+
+	return {
+		success: true,
+		message: `Successfully inserted comment.`,
 		code: response.status
 	};
 }
