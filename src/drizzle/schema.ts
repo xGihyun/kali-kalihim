@@ -10,6 +10,7 @@ import {
   interval,
   decimal,
   unique,
+  boolean,
 } from "drizzle-orm/pg-core";
 
 /*
@@ -53,8 +54,10 @@ export const rubricStatusEnum = pgEnum("rubric_status", ["inactive", "active"]);
  * Tables
  */
 
+// Users
+
 export const UsersTable = pgTable("users", {
-  userId: uuid("user_id").primaryKey().defaultRandom(),
+  id: uuid("user_id").primaryKey().defaultRandom(),
 
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
@@ -62,8 +65,7 @@ export const UsersTable = pgTable("users", {
     .defaultNow()
     .$onUpdate(() => new Date()),
   email: text("email").notNull().unique(),
-
-  // TODO: Remove `password`
+  emailVerified: boolean("email_verified").notNull().default(false),
   password: text("password").notNull(),
   role: roleEnum("role").notNull().default("player"),
 });
@@ -80,10 +82,41 @@ export const UserDetailsTable = pgTable("user_details", {
   bannerUrl: text("banner_url"),
 
   userId: uuid("user_id")
-    .references(() => UsersTable.userId)
+    .references(() => UsersTable.id)
     .notNull()
     .unique(),
 });
+
+// Auth
+
+export const UserSessionsTable = pgTable("user_sessions", {
+  id: text("id").primaryKey(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => UsersTable.id),
+  expiresAt: timestamp("expires_at", {
+    withTimezone: true,
+    mode: "date",
+  }).notNull(),
+});
+
+export const EmailVerificationsTable = pgTable("email_verifications", {
+  id: uuid("email_verification_id").primaryKey().defaultRandom(),
+
+  code: text("code").notNull(),
+  email: text("email").notNull(),
+  expiresAt: timestamp("expires_at", {
+    withTimezone: true,
+    mode: "date",
+  }).notNull(),
+
+  userId: uuid("user_id")
+    .references(() => UsersTable.id)
+    .notNull()
+    .unique(),
+});
+
+// TODO: Create table for password reset tokens
 
 // Player only
 
@@ -129,7 +162,7 @@ export const PlayerSeasonDetailsTable = pgTable(
     rating: smallint("rating").notNull().default(0),
 
     userId: uuid("user_id")
-      .references(() => UsersTable.userId)
+      .references(() => UsersTable.id)
       .notNull(),
     sectionId: uuid("section_id")
       .references(() => SectionsTable.sectionId)
@@ -182,7 +215,7 @@ export const PlayerPowerCardsTable = pgTable("player_power_cards", {
     .references(() => PowerCardsTable.powerCardId)
     .notNull(),
   userId: uuid("user_id")
-    .references(() => UsersTable.userId)
+    .references(() => UsersTable.id)
     .notNull(),
 });
 
@@ -216,7 +249,7 @@ export const MatchCommentsTable = pgTable("match_comments", {
 
   // The admin who commented
   userId: uuid("user_id")
-    .references(() => UsersTable.userId)
+    .references(() => UsersTable.id)
     .notNull(),
   matchId: uuid("match_id")
     .references(() => MatchesTable.matchId)
@@ -268,7 +301,7 @@ export const MatchPlayersTable = pgTable("match_players", {
     .references(() => MatchesTable.matchId)
     .notNull(),
   userId: uuid("user_id")
-    .references(() => UsersTable.userId, { onDelete: "cascade" })
+    .references(() => UsersTable.id, { onDelete: "cascade" })
     .notNull(),
 });
 
@@ -333,7 +366,7 @@ export const ArnisCardBattleTable = pgTable("arnis_card_battles", {
     .notNull()
     .references(() => ArnisCardsTable.arnisCardId),
   userId: uuid("user_id")
-    .references(() => UsersTable.userId, { onDelete: "cascade" })
+    .references(() => UsersTable.id, { onDelete: "cascade" })
     .notNull(),
   matchId: uuid("match_id")
     .references(() => MatchesTable.matchId)
@@ -365,7 +398,7 @@ export const PlayerBadgesTable = pgTable("player_badges", {
     .$onUpdate(() => new Date()),
 
   userId: uuid("user_id")
-    .references(() => UsersTable.userId, { onDelete: "cascade" })
+    .references(() => UsersTable.id, { onDelete: "cascade" })
     .notNull(),
   badgeId: smallserial("badge_id")
     .references(() => BadgesTable.badgeId)

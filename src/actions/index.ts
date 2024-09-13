@@ -25,6 +25,7 @@ import {
   getPersistedPairs,
   getPersistedPlayers,
 } from "@/lib/server/power-cards";
+import { generateEmailVerificationCode } from "@/lib/auth";
 
 // TODO: Rollback transactions on error
 
@@ -44,31 +45,45 @@ export const server = {
         });
       }
 
-      await db.transaction(async (tx) => {
-        const [user] = await tx
-          .insert(UsersTable)
-          .values({ email, password })
-          .returning({ userId: UsersTable.userId });
+      const [user] = await db
+        .insert(UsersTable)
+        .values({ email, password })
+        .returning({ userId: UsersTable.id });
 
-        await tx.insert(UserDetailsTable).values({
-          userId: user.userId,
-          birthDate: birthDate.toDateString(),
-          ...userDetails,
-        });
+      const verificationCode = await generateEmailVerificationCode(
+        user.userId,
+        email,
+      );
 
-        // TODO: Only players have power cards
+      // TODO: Implement with EmailJS
+      await sendVerificationCode(email, verificationCode);
 
-        const powerCards = await tx
-          .select({ powerCardId: PowerCardsTable.powerCardId })
-          .from(PowerCardsTable);
-
-        for (const powerCard of powerCards) {
-          await tx.insert(PlayerPowerCardsTable).values({
-            powerCardId: powerCard.powerCardId,
-            userId: user.userId,
-          });
-        }
-      });
+      // TODO: Hash password
+      //await db.transaction(async (tx) => {
+      //  const [user] = await tx
+      //    .insert(UsersTable)
+      //    .values({ email, password })
+      //    .returning({ userId: UsersTable.id });
+      //
+      //  await tx.insert(UserDetailsTable).values({
+      //    userId: user.userId,
+      //    birthDate: birthDate.toDateString(),
+      //    ...userDetails,
+      //  });
+      //
+      //  // TODO: Only players have power cards
+      //
+      //  const powerCards = await tx
+      //    .select({ powerCardId: PowerCardsTable.powerCardId })
+      //    .from(PowerCardsTable);
+      //
+      //  for (const powerCard of powerCards) {
+      //    await tx.insert(PlayerPowerCardsTable).values({
+      //      powerCardId: powerCard.powerCardId,
+      //      userId: user.userId,
+      //    });
+      //  }
+      //});
 
       console.log("Successfully registered:", email);
     },
