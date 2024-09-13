@@ -4,12 +4,10 @@ import tailwind from "@astrojs/tailwind";
 import Icons from "unplugin-icons/vite";
 
 import vercel from "@astrojs/vercel/serverless";
-import clerk from "@clerk/astro";
 
 // https://astro.build/config
 export default defineConfig({
   integrations: [
-    clerk(),
     react(),
     tailwind({
       applyBaseStyles: false,
