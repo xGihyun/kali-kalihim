@@ -20,6 +20,18 @@ export default defineConfig({
           context: "server",
           access: "secret",
         }),
+        GOOGLE_CLIENT_ID: envField.string({
+          context: "server",
+          access: "secret",
+        }),
+        GOOGLE_CLIENT_SECRET: envField.string({
+          context: "server",
+          access: "secret",
+        }),
+        PUBLIC_URL: envField.string({
+          context: "client",
+          access: "public",
+        }),
       },
     },
   },

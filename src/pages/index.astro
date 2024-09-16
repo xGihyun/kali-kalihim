@@ -17,14 +17,6 @@ import type {
 
 // TODO: Remove this once proper auth is implemented
 //const currentUser = "b00d9f00-0b8a-478d-8240-fa7090d06fb4";
-const { userId } = Astro.locals.auth();
-
-console.log(Astro.locals.auth())
-
-if (!userId) {
-  console.error("User not found.");
-  return Astro.redirect("/register")
-}
 
 type LoadData = {
   powerCards: PlayerPowerCard[];
@@ -32,31 +24,31 @@ type LoadData = {
   previousMatches: PreviousMatchResponseData[];
 };
 
-const data: LoadData = await db.transaction(async (tx) => {
-  const [latestSeason] = await tx
-    .select({ arnisSeasonId: ArnisSeasonsTable.arnisSeasonId })
-    .from(ArnisSeasonsTable)
-    .orderBy(desc(ArnisSeasonsTable.createdAt))
-    .limit(1);
-
-  const powerCards = await getPowerCards(tx, userId);
-  const upcomingMatch = await getUpcomingMatch(
-    tx,
-    userId,
-    latestSeason.arnisSeasonId,
-  );
-  const previousMatches = await getPreviousMatches(
-    tx,
-    userId,
-    latestSeason.arnisSeasonId,
-  );
-
-  return {
-    powerCards,
-    upcomingMatch,
-    previousMatches,
-  };
-});
+//const data: LoadData = await db.transaction(async (tx) => {
+//  const [latestSeason] = await tx
+//    .select({ arnisSeasonId: ArnisSeasonsTable.arnisSeasonId })
+//    .from(ArnisSeasonsTable)
+//    .orderBy(desc(ArnisSeasonsTable.createdAt))
+//    .limit(1);
+//
+//  const powerCards = await getPowerCards(tx, userId);
+//  const upcomingMatch = await getUpcomingMatch(
+//    tx,
+//    userId,
+//    latestSeason.arnisSeasonId,
+//  );
+//  const previousMatches = await getPreviousMatches(
+//    tx,
+//    userId,
+//    latestSeason.arnisSeasonId,
+//  );
+//
+//  return {
+//    powerCards,
+//    upcomingMatch,
+//    previousMatches,
+//  };
+//});
 ---
 
 <Layout title="Home">
@@ -64,9 +56,10 @@ const data: LoadData = await db.transaction(async (tx) => {
     <UserProfile />
 
     <div class="flex w-full flex-col gap-4">
-      <PowerCards powerCards={data.powerCards} />
-      <UpcomingMatch match={data.upcomingMatch} />
-      <PreviousMatches matches={data.previousMatches} />
+      HELLO THERE
+      <!--<PowerCards powerCards={data.powerCards} />-->
+      <!--<UpcomingMatch match={data.upcomingMatch} />-->
+      <!--<PreviousMatches matches={data.previousMatches} />-->
     </div>
   </div>
 </Layout>

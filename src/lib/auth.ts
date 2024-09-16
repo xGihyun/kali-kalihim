@@ -1,11 +1,13 @@
 import { Lucia } from "lucia";
 import { DrizzlePostgreSQLAdapter } from "@lucia-auth/adapter-drizzle";
+import { Google } from "arctic";
 import { db } from "@/drizzle/db";
 import {
-  EmailVerificationsTable,
   UserSessionsTable,
   UsersTable,
 } from "@/drizzle/schema";
+import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from "astro:env/server";
+import { PUBLIC_URL } from "astro:env/client";
 
 const adapter = new DrizzlePostgreSQLAdapter(db, UserSessionsTable, UsersTable);
 
@@ -17,8 +19,8 @@ export const lucia = new Lucia(adapter, {
   },
   getUserAttributes: (attributes) => {
     return {
-      emailVerified: attributes.emailVerified,
-      email: attributes.email,
+      googleId: attributes.google_id,
+      username: attributes.username,
     };
   },
 });
@@ -26,34 +28,17 @@ export const lucia = new Lucia(adapter, {
 declare module "lucia" {
   interface Register {
     Lucia: typeof lucia;
-    DatabaseUserAttributes: {
-      email: string;
-      emailVerified: boolean;
-    };
+    DatabaseUserAttributes: DatabaseUserAttributes;
   }
 }
 
-import { TimeSpan, createDate } from "oslo";
-import { generateRandomString, alphabet } from "oslo/crypto";
-import { eq } from "drizzle-orm";
-
-// TODO: Dependency inject `db`
-export async function generateEmailVerificationCode(
-  userId: string,
-  email: string,
-): Promise<string> {
-  await db
-    .delete(EmailVerificationsTable)
-    .where(eq(EmailVerificationsTable.userId, UsersTable.id));
-
-  const code = generateRandomString(6, alphabet("0-9"));
-
-  await db.insert(EmailVerificationsTable).values({
-    userId: userId,
-    email,
-    code,
-    expiresAt: createDate(new TimeSpan(15, "m")), // 15 minutes
-  });
-
-  return code;
+interface DatabaseUserAttributes {
+  google_id: number;
+  username: string;
 }
+
+export const google = new Google(
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+  `${PUBLIC_URL}/login/google/callback`,
+);

@@ -65,8 +65,6 @@ export const UsersTable = pgTable("users", {
     .defaultNow()
     .$onUpdate(() => new Date()),
   email: text("email").notNull().unique(),
-  emailVerified: boolean("email_verified").notNull().default(false),
-  password: text("password").notNull(),
   role: roleEnum("role").notNull().default("player"),
 });
 
@@ -87,36 +85,6 @@ export const UserDetailsTable = pgTable("user_details", {
     .unique(),
 });
 
-// Auth
-
-export const UserSessionsTable = pgTable("user_sessions", {
-  id: text("id").primaryKey(),
-  userId: uuid("user_id")
-    .notNull()
-    .references(() => UsersTable.id),
-  expiresAt: timestamp("expires_at", {
-    withTimezone: true,
-    mode: "date",
-  }).notNull(),
-});
-
-export const EmailVerificationsTable = pgTable("email_verifications", {
-  id: uuid("email_verification_id").primaryKey().defaultRandom(),
-
-  code: text("code").notNull(),
-  email: text("email").notNull(),
-  expiresAt: timestamp("expires_at", {
-    withTimezone: true,
-    mode: "date",
-  }).notNull(),
-
-  userId: uuid("user_id")
-    .references(() => UsersTable.id)
-    .notNull()
-    .unique(),
-});
-
-// TODO: Create table for password reset tokens
 
 // Player only
 
@@ -181,6 +149,7 @@ export const PlayerSeasonDetailsTable = pgTable(
   },
 );
 
+
 // Power Cards
 
 export const PowerCardsTable = pgTable("power_cards", {
@@ -218,6 +187,7 @@ export const PlayerPowerCardsTable = pgTable("player_power_cards", {
     .references(() => UsersTable.id)
     .notNull(),
 });
+
 
 // Matches
 
@@ -322,6 +292,7 @@ export const MatchPlayerScoresTable = pgTable("match_player_scores", {
     .notNull(),
 });
 
+
 // Card Battle
 
 export const ArnisCardsTable = pgTable("arnis_cards", {
@@ -372,6 +343,7 @@ export const ArnisCardBattleTable = pgTable("arnis_card_battles", {
     .references(() => MatchesTable.matchId)
     .notNull(),
 });
+
 
 // Badges
 
