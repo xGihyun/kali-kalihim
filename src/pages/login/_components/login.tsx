@@ -24,16 +24,7 @@ export default function Component(): JSX.Element {
         <a href="/login/google">
           Login with Google
         </a>
-
-        <Button onClick={() => {
-
-        }}>
-        </Button>
       </CardContent>
     </Card>
   );
 }
-
-//async function handleLogin() {
-//  const url = await getGoogle
-//}

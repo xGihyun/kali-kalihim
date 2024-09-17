@@ -10,7 +10,6 @@ import {
   interval,
   decimal,
   unique,
-  boolean,
 } from "drizzle-orm/pg-core";
 
 /*
@@ -69,7 +68,7 @@ export const UsersTable = pgTable("users", {
 });
 
 export const UserDetailsTable = pgTable("user_details", {
-  userDetailId: uuid("user_detail_id").primaryKey().defaultRandom(),
+  id: uuid("user_detail_id").primaryKey().defaultRandom(),
 
   firstName: text("first_name").notNull(),
   middleName: text("middle_name"),
@@ -80,16 +79,29 @@ export const UserDetailsTable = pgTable("user_details", {
   bannerUrl: text("banner_url"),
 
   userId: uuid("user_id")
-    .references(() => UsersTable.id)
+    .references(() => UsersTable.id, { onDelete: "cascade" })
     .notNull()
     .unique(),
 });
 
+// Auth
+
+export const UserSessionsTable = pgTable("user_sessions", {
+  id: text("user_session_id").primaryKey(),
+  expiresAt: timestamp("expires_at", {
+    withTimezone: true,
+    mode: "date",
+  }).notNull(),
+
+  userId: uuid("user_id")
+    .references(() => UsersTable.id, { onDelete: "cascade" })
+    .notNull()
+});
 
 // Player only
 
 export const SectionsTable = pgTable("sections", {
-  sectionId: uuid("section_id").primaryKey().defaultRandom(),
+  id: uuid("section_id").primaryKey().defaultRandom(),
 
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
@@ -102,7 +114,7 @@ export const SectionsTable = pgTable("sections", {
 });
 
 export const ArnisSeasonsTable = pgTable("arnis_seasons", {
-  arnisSeasonId: smallserial("arnis_season_id").primaryKey(),
+  id: smallserial("arnis_season_id").primaryKey(),
 
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
@@ -117,9 +129,7 @@ export const ArnisSeasonsTable = pgTable("arnis_seasons", {
 export const PlayerSeasonDetailsTable = pgTable(
   "player_season_details",
   {
-    playerSeasonDetailId: uuid("player_season_detail_id")
-      .primaryKey()
-      .defaultRandom(),
+    id: uuid("player_season_detail_id").primaryKey().defaultRandom(),
 
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at")
@@ -130,13 +140,13 @@ export const PlayerSeasonDetailsTable = pgTable(
     rating: smallint("rating").notNull().default(0),
 
     userId: uuid("user_id")
-      .references(() => UsersTable.id)
-      .notNull(),
+      .notNull()
+      .references(() => UsersTable.id, { onDelete: "cascade" }),
     sectionId: uuid("section_id")
-      .references(() => SectionsTable.sectionId)
+      .references(() => SectionsTable.id)
       .notNull(),
     arnisSeasonId: smallserial("arnis_season_id")
-      .references(() => ArnisSeasonsTable.arnisSeasonId)
+      .references(() => ArnisSeasonsTable.id)
       .notNull(),
   },
   (table) => {
@@ -149,11 +159,10 @@ export const PlayerSeasonDetailsTable = pgTable(
   },
 );
 
-
 // Power Cards
 
 export const PowerCardsTable = pgTable("power_cards", {
-  powerCardId: smallserial("power_card_id").primaryKey(),
+  id: smallserial("power_card_id").primaryKey(),
 
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
@@ -171,7 +180,7 @@ export const PowerCardsTable = pgTable("power_cards", {
 });
 
 export const PlayerPowerCardsTable = pgTable("player_power_cards", {
-  playerPowerCardId: uuid("player_power_card_id").primaryKey().defaultRandom(),
+  id: uuid("player_power_card_id").primaryKey().defaultRandom(),
 
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
@@ -181,18 +190,17 @@ export const PlayerPowerCardsTable = pgTable("player_power_cards", {
   status: powerCardStatusEnum("status").notNull().default("inactive"),
 
   powerCardId: smallserial("power_card_id")
-    .references(() => PowerCardsTable.powerCardId)
+    .references(() => PowerCardsTable.id)
     .notNull(),
   userId: uuid("user_id")
-    .references(() => UsersTable.id)
-    .notNull(),
+    .notNull()
+    .references(() => UsersTable.id, { onDelete: "cascade" }),
 });
-
 
 // Matches
 
 export const MatchesTable = pgTable("matches", {
-  matchId: uuid("match_id").primaryKey().defaultRandom(),
+  id: uuid("match_id").primaryKey().defaultRandom(),
 
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
@@ -208,7 +216,7 @@ export const MatchesTable = pgTable("matches", {
 });
 
 export const MatchCommentsTable = pgTable("match_comments", {
-  matchCommentId: uuid("match_comment_id").primaryKey().defaultRandom(),
+  id: uuid("match_comment_id").primaryKey().defaultRandom(),
 
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
@@ -219,15 +227,15 @@ export const MatchCommentsTable = pgTable("match_comments", {
 
   // The admin who commented
   userId: uuid("user_id")
-    .references(() => UsersTable.id)
-    .notNull(),
+    .notNull()
+    .references(() => UsersTable.id, { onDelete: "cascade" }),
   matchId: uuid("match_id")
-    .references(() => MatchesTable.matchId)
+    .references(() => MatchesTable.id)
     .notNull(),
 });
 
 export const ArnisTechniquesTable = pgTable("arnis_techniques", {
-  arnisTechniqueId: smallserial("arnis_technique_id").primaryKey(),
+  id: smallserial("arnis_technique_id").primaryKey(),
 
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
@@ -240,20 +248,18 @@ export const ArnisTechniquesTable = pgTable("arnis_techniques", {
 });
 
 export const MatchArnisTechniquesTable = pgTable("match_arnis_techniques", {
-  matchArnisTechniqueId: uuid("match_arnis_technique_id")
-    .primaryKey()
-    .defaultRandom(),
+  id: uuid("match_arnis_technique_id").primaryKey().defaultRandom(),
 
   matchId: uuid("match_id")
-    .references(() => MatchesTable.matchId)
+    .references(() => MatchesTable.id)
     .notNull(),
   arnisTechniqueId: smallserial("arnis_technique_id")
-    .references(() => ArnisTechniquesTable.arnisTechniqueId)
+    .references(() => ArnisTechniquesTable.id)
     .notNull(),
 });
 
 export const RubricsTable = pgTable("rubrics", {
-  rubricId: smallserial("rubric_id").primaryKey(),
+  id: smallserial("rubric_id").primaryKey(),
 
   name: text("name").notNull(),
   description: text("description"),
@@ -265,90 +271,86 @@ export const RubricsTable = pgTable("rubrics", {
 });
 
 export const MatchPlayersTable = pgTable("match_players", {
-  matchPlayerId: uuid("match_player_id").primaryKey().defaultRandom(),
+  id: uuid("match_player_id").primaryKey().defaultRandom(),
 
   matchId: uuid("match_id")
-    .references(() => MatchesTable.matchId)
+    .references(() => MatchesTable.id)
     .notNull(),
   userId: uuid("user_id")
-    .references(() => UsersTable.id, { onDelete: "cascade" })
-    .notNull(),
+    .notNull()
+    .references(() => UsersTable.id, { onDelete: "cascade" }),
 });
 
 export const MatchPlayerScoresTable = pgTable("match_player_scores", {
-  matchPlayerScoreId: uuid("match_player_score_id")
-    .primaryKey()
-    .defaultRandom(),
+  id: uuid("match_player_score_id").primaryKey().defaultRandom(),
 
   score: smallint("score").notNull(),
 
   matchPlayerId: uuid("match_player_id")
-    .references(() => MatchPlayersTable.matchPlayerId, {
+    .references(() => MatchPlayersTable.id, {
       onDelete: "cascade",
     })
     .notNull(),
   rubricId: smallserial("rubric_id")
-    .references(() => RubricsTable.rubricId)
+    .references(() => RubricsTable.id)
     .notNull(),
 });
-
 
 // Card Battle
 
 export const ArnisCardsTable = pgTable("arnis_cards", {
-  arnisCardId: smallserial("arnis_card_id").primaryKey(),
+  id: smallserial("arnis_card_id").primaryKey(),
 
   name: text("name").notNull(),
   cardType: arnisCardTypeEnum("card_type").notNull(),
 });
 
 export const ArnisCardStatsTable = pgTable("arnis_card_stats", {
-  arnisCardStatId: smallserial("arnis_card_stat_id").primaryKey(),
+  id: smallserial("arnis_card_stat_id").primaryKey(),
 
   name: text("name").notNull(),
   amount: decimal("amount", { scale: 5, precision: 2 }).notNull(),
 
   arnisCardId: smallserial("arnis_card_id")
-    .references(() => ArnisCardsTable.arnisCardId, { onDelete: "cascade" })
+    .references(() => ArnisCardsTable.id, { onDelete: "cascade" })
     .notNull()
     .unique(),
 });
 
 export const ArnisCardEffectsTable = pgTable("arnis_card_effects", {
-  arnisCardEffectId: smallserial("arnis_card_effect_id").primaryKey(),
+  id: smallserial("arnis_card_effect_id").primaryKey(),
 
   amount: decimal("amount", { scale: 5, precision: 2 }).notNull(),
   target: arnisCardEffectTargetEnum("target").notNull(),
 
   arnisCardStatId: smallserial("arnis_card_stat_id")
-    .references(() => ArnisCardStatsTable.arnisCardStatId, {
+    .references(() => ArnisCardStatsTable.id, {
       onDelete: "cascade",
     })
     .notNull(),
 });
 
 export const ArnisCardBattleTable = pgTable("arnis_card_battles", {
-  arnisCardBattleId: uuid("arnis_card_battle_id").primaryKey().defaultRandom(),
+  id: uuid("arnis_card_battle_id").primaryKey().defaultRandom(),
 
   status: arnisCardBattleStatusEnum("status"),
   damage: decimal("damage", { scale: 5, precision: 2 }),
 
   arnisCardId: smallserial("arnis_card_id")
     .notNull()
-    .references(() => ArnisCardsTable.arnisCardId),
+    .references(() => ArnisCardsTable.id),
   userId: uuid("user_id")
     .references(() => UsersTable.id, { onDelete: "cascade" })
     .notNull(),
   matchId: uuid("match_id")
-    .references(() => MatchesTable.matchId)
+    .references(() => MatchesTable.id)
     .notNull(),
 });
-
 
 // Badges
 
 export const BadgesTable = pgTable("badges", {
-  badgeId: smallserial("badge_id").primaryKey(),
+  id: smallserial("badge_id").primaryKey(),
 
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
@@ -361,7 +363,7 @@ export const BadgesTable = pgTable("badges", {
 });
 
 export const PlayerBadgesTable = pgTable("player_badges", {
-  playerBadgeId: uuid("player_badge_id").primaryKey().defaultRandom(),
+  id: uuid("player_badge_id").primaryKey().defaultRandom(),
 
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
@@ -373,6 +375,6 @@ export const PlayerBadgesTable = pgTable("player_badges", {
     .references(() => UsersTable.id, { onDelete: "cascade" })
     .notNull(),
   badgeId: smallserial("badge_id")
-    .references(() => BadgesTable.badgeId)
+    .references(() => BadgesTable.id)
     .notNull(),
 });

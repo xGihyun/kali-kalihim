@@ -4,7 +4,7 @@ import type { InferSelectModel } from "drizzle-orm";
 
 const userRoleEnum = z.enum(roleEnum.enumValues);
 
-type UserRole = z.infer<typeof userRoleEnum>;
+export type UserRole = z.infer<typeof userRoleEnum>;
 
 export type UserRoleCount = {
   role: UserRole;

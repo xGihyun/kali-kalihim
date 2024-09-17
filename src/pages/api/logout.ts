@@ -3,9 +3,7 @@ import type { APIContext } from "astro";
 
 export async function POST(context: APIContext): Promise<Response> {
   if (!context.locals.session) {
-    return new Response(null, {
-      status: 401,
-    });
+    return context.redirect("/login");
   }
 
   await lucia.invalidateSession(context.locals.session.id);

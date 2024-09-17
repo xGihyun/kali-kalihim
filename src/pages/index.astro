@@ -15,14 +15,13 @@ import type {
   PreviousMatchResponseData,
 } from "@/lib/types/match";
 
-// TODO: Remove this once proper auth is implemented
-//const currentUser = "b00d9f00-0b8a-478d-8240-fa7090d06fb4";
-
 type LoadData = {
   powerCards: PlayerPowerCard[];
   upcomingMatch: UpcomingMatchResponseData | null;
   previousMatches: PreviousMatchResponseData[];
 };
+
+console.log(Astro.locals.user)
 
 //const data: LoadData = await db.transaction(async (tx) => {
 //  const [latestSeason] = await tx
